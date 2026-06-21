@@ -1,27 +1,35 @@
 /* =========================================
-   Базові налаштування та змінні
+   Базові налаштування та змінні (Необруталізм)
 ========================================= */
 :root {
-  --bg-color: #0F172A;          /* Глибокий темний фон */
-  --card-bg: #1E293B;           /* Фон карток */
-  --text-main: #F8FAFC;         /* Світлий текст */
-  --text-muted: #94A3B8;        /* Приглушений текст */
-  --accent-blue: #10B981;       /* Смарагдовий (зелений) акцент */
-  --accent-blue-hover: #059669; /* Темніший зелений для ховера */
-  --border-color: #334155;      /* Темні рамки */
+  --bg-color: #FDF8E3;          /* Світло-жовтуватий фон */
+  --card-bg: #FFFFFF;           /* Білий фон карток */
+  --text-main: #000000;         /* Жорсткий чорний текст */
+  --text-muted: #222222;        
+  --accent-primary: #FF5722;    /* Яскраво-помаранчевий */
+  --accent-secondary: #FFD500;  /* Жовтий акцент */
+  --accent-pink: #FF1493;       /* Неоново-рожевий */
+  --border-color: #000000;      /* Тільки чорні рамки! */
+  
+  /* Жорсткі тіні - фішка необруталізму */
+  --brutal-shadow: 6px 6px 0px #000000; 
+  --brutal-shadow-hover: 8px 8px 0px #000000;
+  --brutal-shadow-sm: 3px 3px 0px #000000;
 }
 
-/* Для темної теми краще замінити тіні карток */
-.card {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-.card h2 { color: #F8FAFC; } /* Робимо заголовки світлими */
+
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  font-weight: 500; /* Робимо текст трохи жирнішим для стилю */
 }
 
 /* =========================================
@@ -38,29 +46,34 @@ header {
   margin-bottom: 56px;
 }
 
+/* Бейдж в хедері */
 .badge {
   display: inline-block;
-  background-color: #EFF6FF;
-  color: var(--accent-blue);
+  background-color: var(--accent-pink);
+  color: #FFFFFF;
   padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
   margin-bottom: 20px;
-  border: 1px solid #BFDBFE;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--brutal-shadow-sm);
+  border-radius: 8px; /* Менш круглі кути */
 }
 
 header h1 {
-  font-size: 2.75rem;
-  font-weight: 800;
-  color: #111827;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #000000;
   margin-bottom: 12px;
   letter-spacing: -0.025em;
+  text-transform: uppercase;
 }
 
 header p {
   color: var(--text-muted);
   font-size: 1.15rem;
+  font-weight: 600;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -71,23 +84,24 @@ header p {
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
+  gap: 32px; /* Трохи збільшив відступ між жорсткими тінями */
 }
 
 .card {
   background: var(--card-bg);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 4px solid var(--border-color); /* Товста рамка */
+  box-shadow: var(--brutal-shadow);      /* Суцільна тінь */
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
 }
 
+/* Ефект "підняття" при наведенні */
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  transform: translate(-3px, -3px);
+  box-shadow: var(--brutal-shadow-hover);
 }
 
 .card.full-width {
@@ -95,16 +109,18 @@ header p {
 }
 
 .card h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 900;
   margin-bottom: 12px;
-  color: #111827;
+  color: #000000;
+  text-transform: uppercase;
 }
 
 .card p {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 1rem;
   margin-bottom: 24px;
+  font-weight: 600;
 }
 
 /* =========================================
@@ -122,25 +138,26 @@ header p {
   margin-bottom: 12px;
   font-size: 0.95rem;
   color: var(--text-main);
+  font-weight: 600;
 }
 
 .features-list li::before {
-  content: '✓';
+  content: '👉'; /* Змінив галочку на більш фановий емодзі */
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--accent-blue);
-  font-weight: 800;
 }
 
 code {
-  background-color: #F3F4F6;
-  color: #DC2626; 
-  padding: 3px 6px;
-  border-radius: 6px;
+  background-color: #E5E7EB;
+  color: #000000; 
+  padding: 3px 8px;
+  border-radius: 4px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.85em;
-  border: 1px solid #E5E7EB;
+  font-size: 0.9em;
+  font-weight: 800;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0px #000000;
 }
 
 /* =========================================
@@ -151,42 +168,38 @@ code {
   width: 100%;
   text-align: center;
   padding: 14px 20px;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-weight: 900;
   font-size: 1rem;
   text-decoration: none;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
+  transition: all 0.1s ease; /* Швидша реакція */
+  border: 3px solid var(--border-color);
 }
 
 .btn-primary {
-  background-color: var(--accent-blue);
+  background-color: var(--accent-primary);
   color: #FFFFFF;
-  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+  box-shadow: var(--brutal-shadow-sm);
 }
 
-.btn-primary:hover {
-  background-color: var(--accent-blue-hover);
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
+/* Ефект "натискання" фізичної кнопки */
+.btn-primary:active, .btn-secondary:active, .btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000000;
 }
 
 .btn-secondary {
-  background-color: #F9FAFB;
-  color: var(--text-main);
-  border: 1px dashed #D1D5DB;
-}
-
-.btn-secondary:hover {
-  background-color: #F3F4F6;
-  border-color: #9CA3AF;
-  color: #111827;
+  background-color: var(--accent-secondary);
+  color: #000000;
+  box-shadow: var(--brutal-shadow-sm);
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-top: auto;
 }
 
@@ -194,8 +207,8 @@ code {
    Журнал змін (Changelog)
 ========================================= */
 .changelog-wrapper {
-  border-left: 2px solid #E5E7EB;
-  margin-left: 8px;
+  border-left: 4px solid var(--border-color);
+  margin-left: 12px;
   padding-left: 28px;
   position: relative;
 }
@@ -207,36 +220,40 @@ code {
 .changelog-item::before {
   content: '';
   position: absolute;
-  left: -35px;
-  top: 6px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--accent-blue);
-  border: 3px solid var(--card-bg); 
+  left: -40px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 0; /* Квадратна точка замість круглої */
+  background: #00E676; /* Яскраво-зелений */
+  border: 3px solid var(--border-color); 
 }
 
 .changelog-version {
-  font-weight: 700;
-  color: #111827;
-  font-size: 1.05rem;
+  font-weight: 900;
+  color: #000000;
+  font-size: 1.15rem;
   margin-bottom: 2px;
+  text-transform: uppercase;
 }
 
 .changelog-date {
-  font-size: 0.85rem;
-  color: #6B7280;
+  font-size: 0.9rem;
+  color: #555555;
+  font-weight: 700;
   margin-bottom: 12px;
 }
 
 .changelog-notes {
-  color: var(--text-muted);
+  color: var(--text-main);
   font-size: 0.95rem;
-  background: #F9FAFB;
+  font-weight: 600;
+  background: #FFFFFF;
   padding: 16px;
-  border-radius: 10px;
-  border: 1px solid #E5E7EB;
-  line-height: 1.5;
+  border-radius: 8px;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--brutal-shadow-sm);
+  line-height: 1.6;
 }
 
 /* =========================================
@@ -244,38 +261,44 @@ code {
 ========================================= */
 footer {
   text-align: center;
-  padding: 40px 20px 60px;
+  padding: 40px 20px 80px;
 }
 
 .feedback-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: var(--card-bg);
-  border: 1px solid #D1D5DB;
-  border-radius: 9999px;
-  color: var(--text-muted);
+  gap: 10px;
+  padding: 12px 24px;
+  background: #FFFFFF;
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  color: #000000;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+  box-shadow: var(--brutal-shadow-sm);
 }
 
-.feedback-btn:hover {
-  background: #F9FAFB;
-  color: #111827;
-  border-color: #9CA3AF;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.feedback-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000000;
 }
 
 #status {
   text-align: center;
-  font-size: 0.85rem;
-  color: #10B981; 
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #000000; 
+  background: #00E676;
   margin-top: 12px;
   min-height: 1.5em;
+  padding: 2px;
+  border-radius: 4px;
+}
+#status:empty {
+  display: none;
 }
 
 /* =========================================
@@ -284,45 +307,46 @@ footer {
 .secret-box {
   max-width: 600px;
   margin: 60px auto 0;
-  background: #111827; /* Темно-вугільний фон для контрасту */
-  color: #F9FAFB;
-  border-radius: 16px;
+  background: #B388FF; /* Яскраво-фіолетовий для контрасту */
+  color: #000000;
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #374151;
+  border: 4px solid var(--border-color);
+  box-shadow: var(--brutal-shadow);
 }
 
 .secret-icon {
-  font-size: 2.5rem;
+  font-size: 3rem;
   line-height: 1;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
 
-/* ДОДАНО: виправлення для блоку з текстом */
 .secret-content {
   flex: 1;
   min-width: 0;
 }
 
 .secret-content h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #FCD34D; /* Золотий акцент */
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #000000; 
+  background: #FFFFFF; /* Виділяємо заголовок як маркер */
+  display: inline-block;
+  padding: 4px 12px;
+  border: 3px solid var(--border-color);
+  margin-bottom: 12px;
   text-transform: uppercase;
+  box-shadow: 2px 2px 0px #000000;
 }
 
 .secret-content p {
-  font-size: 0.95rem;
-  color: #D1D5DB;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
   line-height: 1.6;
   margin: 0;
-  
-  /* ДОДАНО: виправлення перенесення і обрізання тексту */
   white-space: normal;
   word-wrap: break-word;
   overflow: visible;
@@ -331,34 +355,68 @@ footer {
 }
 
 .secret-content strong {
-  color: #FFFFFF;
+  color: #000000;
+  font-weight: 900;
+  background: #FFD500;
+  padding: 0 4px;
 }
 
 .secret-content b {
-  color: #EF4444; /* Червоний акцент на "не паліться" */
-  font-weight: 700;
+  color: #FFFFFF;
+  background: #FF0000; /* Жорсткий червоний акцент на "не паліться" */
+  font-weight: 900;
+  padding: 2px 6px;
+  border: 2px solid #000000;
+  text-transform: uppercase;
 }
 
 /* =========================================
    Стилізація кнопки Telegram
 ========================================= */
 .telegram-btn {
-  background: #FFFFFF;
-  color: #229ED9; /* Офіційний колір Telegram */
-  border-color: #E5E7EB;
-  font-weight: 600;
+  background: #229ED9; /* Офіційний колір Telegram */
+  color: #FFFFFF;
 }
 
 .telegram-btn svg {
   transition: transform 0.2s ease;
 }
 
-.telegram-btn:hover {
-  background: #F0F9FF;
-  color: #1CA0EB;
-  border-color: #BAE6FD;
+.telegram-btn:hover svg {
+  transform: scale(1.2) rotate(-10deg);
 }
 
-.telegram-btn:hover svg {
-  transform: scale(1.1);
+/* =========================================
+   Бейдж статусу (з минулої розмови)
+========================================= */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--brutal-shadow-sm);
+}
+
+.status-online {
+  background-color: #00E676; /* Неоновий зелений */
+  color: #000000;
+}
+
+.status-updating {
+  background-color: #FF0000;
+  color: #FFFFFF;
+}
+
+.pulse-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #000000;
+  border-radius: 0; /* Робимо крапку квадратною */
+  animation: none; /* У бруталізмі краще без плавних пульсацій */
 }
