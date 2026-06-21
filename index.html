@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C-RET & Narzędzia | Skrypty</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">Narzędzia produktywności</div>
+      <h1>C-RET & Clean-Decant</h1>
+      <p>Skrypty do śledzenia Twojego tempa pracy i ilości paczek.</p>
+    </header>
+
+    <div class="cards-grid">
+      
+      <div class="card">
+        <h2>⚡ C-RET (Tampermonkey)</h2>
+        <p>Skrypt działający w tle. Posiada ukryty interfejs, wysuwane panele oraz pauzę tempa.</p>
+        <ul class="features-list">
+          <li>Ukryty widget (przezroczystość w spoczynku)</li>
+          <li>Przycisk przerwy (pauza tempa na 30 min)</li>
+          <li>Skróty: <code>Ctrl+Z</code> (ustawienia), <code>Shift+X</code> (pokaż)</li>
+        </ul>
+        <button class="btn btn-primary" onclick="copyTampermonkeyCode()">
+          📋 Skopiuj kod do schowka
+        </button>
+        <div id="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>📦 C-RET (Zakładka)</h2>
+        <p>Tradycyjny licznik w formie zakładki (dawniej REIT+). Wystarczy przeciągnąć przycisk na pasek przeglądarki.</p>
+        <ul class="features-list">
+          <li>Instalacja bez dodatkowych rozszerzeń</li>
+          <li>Duży interfejs po prawej stronie ekranu</li>
+        </ul>
+        <a id="cret-bookmark-btn" class="btn btn-secondary" href="#">
+          ⏳ Ładowanie...
+        </a>
+      </div>
+
+      <div class="card">
+        <h2>🧼 Clean-Decant PL</h2>
+        <p>Specjalna wersja licznika dostosowana do procesu Clean-Decant w języku polskim.</p>
+        <ul class="features-list">
+          <li>Odświeżony interfejs bez neonu i cieni</li>
+          <li>Reit docelowy: 110/h</li>
+          <li>Wybór pozycji widgetu na ekranie</li>
+        </ul>
+        <a id="cd-pl-bookmark-btn" class="btn btn-secondary" href="#">
+          ⏳ Ładowanie...
+        </a>
+      </div>
+
+      <div class="card">
+        <h2>🧼 Clean-Decant UA</h2>
+        <p>Спеціальна версія лічильника, адаптована до процесу Clean-Decant для укр і ру інтерфейсу.</p>
+        <ul class="features-list">
+          <li>Оновлений інтерфейс без проблемних функцій</li>
+          <li>Цільовий Reit: 110/год</li>
+          <li>Вибір положення віджета на екрані</li>
+        </ul>
+        <a id="cd-ua-bookmark-btn" class="btn btn-secondary" href="#">
+          ⏳ Завантаження...
+        </a>
+      </div>
+
+      <div class="card full-width">
+        <h2>🔄 Dziennik zmian</h2>
+        <p style="margin-bottom: 24px;">Historia aktualizacji skryptów.</p>
+        <div class="changelog-wrapper">
+          <div class="changelog-item">
+            <div class="changelog-version">v6.9 Повний фікс парсингу змінних</div>
+            <div class="changelog-date">Останнє оновлення</div>
+            <div class="changelog-notes">
+              Усунено критичний баг з екрануванням змінних у закладках, через який інтерфейс виводив помилки або повністю не завантажувався.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <a href="mailto:twoj@email.com?subject=Feedback:%20C-RET" class="feedback-btn">
+      💬 Zostaw opinię / Zgłoś błąd
+    </a>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
