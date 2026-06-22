@@ -69,16 +69,48 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card full-width">
         <h2>🔥 Ostre</h2>
-        <p>Nowy skrypt Ostre. (Тут можна додати короткий опис того, що він робить).</p>
-        <ul class="features-list">
-          <li>Нова функція / Nowa funkcja 1</li>
-          <li>Нова функція / Nowa funkcja 2</li>
-        </ul>
-        <a id="ostre-bookmark-btn" class="btn btn-secondary" href="#">
-          📌 Przeciągnij do paska (Ostre)
-        </a>
+        <p style="margin-bottom: 16px;">Виберіть потрібну версію скрипта для вашого процесу.</p>
+        
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="tab-cret">Ostre C-Ret</button>
+          <button class="tab-btn" data-tab="tab-whd">Ostre WHD</button>
+          <button class="tab-btn" data-tab="tab-refarb">Ostre Refarb</button>
+        </div>
+
+        <div class="tab-content active" id="tab-cret">
+          <p>Скрипт оптимізований спеціально для процесу Customer Returns (C-Ret).</p>
+          <ul class="features-list">
+            <li>Підрахунок цільового рейту для C-Ret</li>
+            <li>Автоматичний трекінг часу Off-Task</li>
+          </ul>
+          <a id="ostre-cret-btn" class="btn btn-secondary" href="#">
+            📌 Przeciągnij do paska (Ostre C-Ret)
+          </a>
+        </div>
+
+        <div class="tab-content" id="tab-whd">
+          <p>Скрипт для роботи на процесі WHD (Warehouse Deals).</p>
+          <ul class="features-list">
+            <li>Специфічні тригери для WHD</li>
+            <li>Оновлений інтерфейс лічильника</li>
+          </ul>
+          <a id="ostre-whd-btn" class="btn btn-secondary" href="#">
+            📌 Przeciągnij do paska (Ostre WHD)
+          </a>
+        </div>
+
+        <div class="tab-content" id="tab-refarb">
+          <p>Скрипт, налаштований під процес Refurbishment (Refarb).</p>
+          <ul class="features-list">
+            <li>Точний підрахунок одиниць після відновлення</li>
+            <li>Збереження локальної статистики</li>
+          </ul>
+          <a id="ostre-refarb-btn" class="btn btn-secondary" href="#">
+            📌 Przeciągnij do paska (Ostre Refarb)
+          </a>
+        </div>
       </div>
 
       <div class="card full-width">
