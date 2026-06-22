@@ -1,4 +1,4 @@
-javascript:(function(){
+(() => {
   if (window.scanCounterV29) return;
   window.scanCounterV29 = true;
   document.querySelectorAll('[data-reit-counter]').forEach((el) => el.remove());
