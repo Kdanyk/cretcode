@@ -11,18 +11,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    // Асинхронно завантажуємо всі скрипти з папки scripts/
-    const [cretRes, cdPlRes, cdUaRes, tmRes] = await Promise.all([
+    // Асинхронно завантажуємо всі скрипти з папки scripts/ (додано ostre.js)
+    const [cretRes, cdPlRes, cdUaRes, tmRes, ostreRes] = await Promise.all([
       fetch('scripts/cret.js'),
       fetch('scripts/clean-decant-pl.js'),
       fetch('scripts/clean-decant-ua.js'),
-      fetch('scripts/tampermonkey.js')
+      fetch('scripts/tampermonkey.js'),
+      fetch('scripts/ostre.js') // Завантаження нового скрипта
     ]);
 
     // Отримуємо текст
     const cretRaw = await cretRes.text();
     const cdPlRaw = await cdPlRes.text();
     const cdUaRaw = await cdUaRes.text();
+    const ostreRaw = await ostreRes.text(); // Текст для Ostre
     tampermonkeyRawCode = await tmRes.text(); // Зберігаємо для копіювання
 
     // Призначаємо букмарклети кнопкам
@@ -42,6 +44,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(btnCdUa) { 
       btnCdUa.href = makeBookmarklet(cdUaRaw); 
       btnCdUa.textContent = "🔖 Перетягнути до закладок (UA)"; 
+    }
+
+    // Призначаємо букмарклет для нової кнопки Ostre
+    const btnOstre = document.getElementById('ostre-bookmark-btn');
+    if(btnOstre) { 
+      btnOstre.href = makeBookmarklet(ostreRaw); 
+      btnOstre.textContent = "🔖 Przeciągnij do paska (Ostre)"; 
     }
 
   } catch (error) {
