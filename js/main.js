@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnOstreWhd = document.getElementById('ostre-whd-btn');
     if(btnOstreWhd) { 
       btnOstreWhd.href = makeBookmarklet(ostreWhdRaw); 
-      btnOstreWhd.textContent = "🔖 Przeciągnij do paska (WHD)"; 
+      btnOstreWhd.textContent = "🔖 Przeciągnij do paska (🪛WHD)"; 
     }
 
     const btnOstreRefarb = document.getElementById('ostre-refarb-btn');
