@@ -178,18 +178,49 @@
     const rate = currentRate(); box.innerHTML = miniText(); box.style.color = miniColor(rate);
     const p = panel.querySelector('#miniPreview'); if (p) { p.textContent = miniText(); p.style.color = miniColor(rate); }
   }
-  function addPacks(n) { n = parseInt(n) || 0; if (n <= 0) return; const slot = getSlot(); hourCounts[slot] += n; recalcTotal(); lastTrigger = 'RĘCZNIE +' + n + ' ' + timeNow(); markActivity(); saveState(true); render(); }
-  function removePack() { const slot = getSlot(); if (hourlyTotal() > 0) { hourCounts[slot] = Math.max(0, hourCounts[slot] - 1); recalcTotal(); lastTrigger = 'RĘCZNIE -1 ' + timeNow(); saveState(true); render(); } }
-  function addProblem(n) { n = parseInt(n) || 0; if (n <= 0) return; problemTotal += n; problemCounts[getSlot()] += n; lastTrigger = 'PROBLEM ' + timeNow(); markActivity(); saveState(true); render(); }
+  
+  function addPacks(n) { 
+    n = parseInt(n) || 0; if (n <= 0) return; 
+    loadState();
+    const slot = getSlot(); hourCounts[slot] += n; 
+    recalcTotal(); lastTrigger = 'RĘCZNIE +' + n + ' ' + timeNow(); 
+    markActivity(); saveState(true); render(); 
+  }
+  function removePack() { 
+    loadState();
+    const slot = getSlot(); 
+    if (hourlyTotal() > 0) { 
+        hourCounts[slot] = Math.max(0, hourCounts[slot] - 1); 
+        recalcTotal(); lastTrigger = 'RĘCZNIE -1 ' + timeNow(); 
+        saveState(true); render(); 
+    } 
+  }
+  function addProblem(n) { 
+    n = parseInt(n) || 0; if (n <= 0) return; 
+    loadState();
+    problemTotal += n; problemCounts[getSlot()] += n; 
+    lastTrigger = 'PROBLEM ' + timeNow(); markActivity(); saveState(true); render(); 
+  }
+  
   function bindCountInputs() {
     panel.querySelectorAll('.hc').forEach((inp) => {
-      inp.oninput = (e) => { hourCounts[e.target.getAttribute('data-h')] = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); saveState(); };
-      inp.onblur = (e) => { e.target.value = hourCounts[e.target.getAttribute('data-h')] || 0; lastTrigger = 'RĘCZNIE ' + timeNow(); renderHours(true); saveState(true); render(); };
+      inp.oninput = (e) => { hourCounts[e.target.getAttribute('data-h')] = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); };
+      inp.onblur = (e) => { 
+          let newVal = Math.max(0, parseInt(e.target.value) || 0);
+          loadState();
+          hourCounts[e.target.getAttribute('data-h')] = newVal;
+          lastTrigger = 'RĘCZNIE ' + timeNow(); saveState(true); renderHours(true); render(); 
+      };
     });
     const bb = panel.querySelector('#beforeBreak');
     if (bb) {
-      bb.oninput = (e) => { beforeBreak = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); saveState(); };
-      bb.onblur = (e) => { e.target.value = beforeBreak || 0; lastTrigger = 'RĘCZNIE ' + timeNow(); renderHours(true); saveState(true); render(); };
+      bb.oninput = (e) => { beforeBreak = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); };
+      bb.onblur = (e) => { 
+          let newVal = Math.max(0, parseInt(e.target.value) || 0);
+          loadState();
+          beforeBreak = newVal;
+          lastTrigger = 'RĘCZNIE ' + timeNow(); saveState(true); renderHours(true); render(); 
+      };
     }
   }
   function renderHours(force) {
@@ -197,46 +228,56 @@
     if (!force && active && panel.contains(active) && (active.classList.contains('hc') || active.id === 'beforeBreak')) return;
     const visibleHours = night ? nightHours : dayHours;
     const max = Math.max(targetPerHour, beforeBreak, ...visibleHours.map((h) => hourCounts[h] || 0), 1);
-    let rows = visibleHours.map((h) => {
+    let rows = visibleHours.map((h, i) => {
       const val = hourCounts[h] || 0, bars = Math.min(100, Math.round((val / max) * 100)), good = val >= targetPerHour;
-      return `<div style="display:grid; grid-template-columns:40px 45px 1fr; gap:10px; align-items:center; background:#ffffff; border:1px solid rgba(0,0,0,0.05); border-radius:8px; padding:6px 10px; margin-bottom:6px; border-left:4px solid ${good ? '#22c55e' : '#cbd5e1'}; width:100%; box-sizing:border-box;">
+      const cumTarget = (i + 1) * targetPerHour;
+      return `<div style="display:grid; grid-template-columns:40px 45px 30px 1fr; gap:6px; align-items:center; background:#ffffff; border:1px solid rgba(0,0,0,0.05); border-radius:8px; padding:6px 10px; margin-bottom:6px; border-left:4px solid ${good ? '#22c55e' : '#cbd5e1'}; width:100%; box-sizing:border-box;">
         <b style="font-size:12px; text-align:left; color:#475569;">${h}</b>
         <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="width:100%; padding:4px 6px; border:1px solid #e2e8f0; border-radius:4px; background:#f8fafc; color:#1e293b; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box;">
+        <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;">/${cumTarget}</div>
         <div style="height:6px; background:#f1f5f9; border-radius:999px; overflow:hidden; width:100%;">
           <div style="height:100%; width:${bars}%; background:${good ? '#22c55e' : '#3b82f6'}; border-radius:999px; transition:width 0.4s ease;"></div>
         </div>
       </div>`;
     }).join('');
     const bbBars = Math.min(100, Math.round((beforeBreak / max) * 100));
-    rows += `<div style="display:grid; grid-template-columns:85px 45px 1fr; gap:10px; align-items:center; background:#f8fafc; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 10px; margin-top:12px; margin-bottom:6px; border-left:4px solid #94a3b8; width:100%; box-sizing:border-box;">
+    rows += `<div style="display:grid; grid-template-columns:85px 45px 30px 1fr; gap:6px; align-items:center; background:#f8fafc; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 10px; margin-top:12px; margin-bottom:6px; border-left:4px solid #94a3b8; width:100%; box-sizing:border-box;">
       <b style="font-size:11px; text-align:left; color:#475569;">Przed przerwą</b>
       <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:100%; padding:4px 6px; border:1px solid #e2e8f0; border-radius:4px; background:#ffffff; color:#1e293b; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box;">
+      <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;"></div>
       <div style="height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; width:100%;">
         <div style="height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#94a3b8; border-radius:999px; transition:width 0.4s ease;"></div>
       </div>
     </div>`;
     panel.querySelector('#hours').innerHTML = rows; bindCountInputs();
   }
+  
   function render() {
     recalcTotal(); const now = Date.now();
     if (now - lastActivityTime > grace) { offRemain -= now - offLastTick; if (offRemain < 0) offRemain = 0; }
     offLastTick = now;
     panel.querySelector('#lt').textContent = lastTrigger; panel.querySelector('#off').textContent = fmt(offRemain);
     panel.querySelector('#pb').textContent = problemTotal; panel.querySelector('#left').textContent = Math.max(0, shiftTarget() - total);
-    applyMini(); renderHours(false); saveState();
+    applyMini(); renderHours(false); 
   }
+  
   function scan() {
     const txt = document.body.innerText || '', m = cnt(txt, triggerText), p = cnt(seen, triggerText), pm = cnt(txt, problemText), pp = cnt(seen, problemText), nlpm = cnt(txt, nlpText), nlpp = cnt(seen, nlpText);
-    if (nlpm > nlpp) { skipNextPack = true; lastTrigger = 'NLP: POMIŃ NASTĘPNĄ ' + timeNow(); markActivity(); render(); }
+    if (nlpm > nlpp) { skipNextPack = true; lastTrigger = 'NLP: POMIŃ NASTĘPNĄ ' + timeNow(); markActivity(); saveState(true); render(); }
     if (pm > pp) addProblem(pm - pp);
-    else if (m > p) { let diff = m - p; if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'POMINIĘTO PO NLP ' + timeNow(); } if (diff > 0) addPacks(diff); }
+    else if (m > p) { 
+      let diff = m - p; 
+      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'POMINIĘTO PO NLP ' + timeNow(); } 
+      if (diff > 0) { addPacks(diff); }
+    }
     seen = txt;
   }
+  
   function toggleUI() { open = !open; panel.style.transform = open ? 'translateX(0)' : 'translateX(370px)'; panel.style.opacity = open ? '1' : '0'; panel.style.pointerEvents = open ? 'auto' : 'none'; }
   function showSettings(v) { panel.querySelector('#mainView').style.display = v ? 'none' : 'block'; panel.querySelector('#settingsView').style.display = v ? 'block' : 'none'; applyMini(); }
 
   setInterval(scan, 1000); setInterval(render, 1000); window.addEventListener('beforeunload', () => saveState(true)); box.onclick = toggleUI;
-  document.addEventListener('keydown', (e) => { if (e.shiftKey && e.key.toLowerCase() === 'u') toggleUI(); if (e.altKey && e.key.toLowerCase() === 'p') removePack(); if (e.altKey && e.key.toLowerCase() === 'o') addPacks(1); });
+
   panel.querySelector('#settingsBtn').onclick = () => showSettings(true); panel.querySelector('#backBtn').onclick = () => showSettings(false);
   panel.querySelector('#ratePercent').checked = showRatePercent; panel.querySelector('#leftMode').checked = showLeftInsteadTotal; panel.querySelector('#autoColor').checked = autoStatusColor;
   panel.querySelector('#pos').onchange = (e) => { miniPos = e.target.value; applyMiniPos(); saveState(true); };
@@ -248,5 +289,13 @@
   panel.querySelector('#s').oninput = (e) => { miniSize = parseInt(e.target.value) || 12; box.style.fontSize = miniSize + 'px'; saveState(true); };
   panel.querySelector('#o').oninput = (e) => { miniOpacity = parseInt(e.target.value) || 0; box.style.opacity = miniOpacity / 100; saveState(true); };
   panel.querySelector('#target').oninput = (e) => { targetPerHour = parseInt(e.target.value) || 44; saveState(true); render(); };
+  
+  window.addEventListener('storage', (e) => {
+    if (e.key === saveKey) {
+      loadState();
+      render();
+    }
+  });
+
   render(); scan(); renderHours(true); applyMini();
 })();
