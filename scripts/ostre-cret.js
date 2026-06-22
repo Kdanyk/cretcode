@@ -13,7 +13,7 @@
   const shiftName = night ? 'night' : 'day';
 
   let total = 0, problemTotal = 0, seen = '', start = Date.now(), lastTrigger = '-';
-  let targetPerHour = 44, beforeBreak = 0, open = true, grace = 4 * 60 * 1000;
+  let targetPerHour = 44, beforeBreak = 0, open = true, grace = 4 * 60 * 1000, selectedBreak = 0;
   let offRemain = 30 * 60 * 1000, lastActivityTime = Date.now(), offLastTick = Date.now();
   let triggerText = 'Wprowadź pojemnik', problemText = 'Zeskanuj - PROBLEM-SOLVE', nlpText = 'Zeskanuj nowy NLP';
   let skipNextPack = false, showRatePercent = false, showLeftInsteadTotal = false, autoStatusColor = false;
@@ -29,6 +29,7 @@
       problemTotal = Math.max(0, parseInt(s.problemTotal) || 0);
       beforeBreak = Math.max(0, parseInt(s.beforeBreak) || 0);
       targetPerHour = Math.max(1, parseInt(s.targetPerHour) || 44);
+      selectedBreak = parseInt(s.selectedBreak) || 0;
       offRemain = Math.max(0, Number(s.offRemain) || 30 * 60 * 1000);
       showRatePercent = !!s.showRatePercent;
       showLeftInsteadTotal = !!s.showLeftInsteadTotal;
@@ -50,10 +51,46 @@
     const now = Date.now();
     if (!force && now - lastSave < 1500) return;
     lastSave = now;
-    try { localStorage.setItem(saveKey, JSON.stringify({ shift: shiftName, savedAt: now, start, problemTotal, beforeBreak, targetPerHour, offRemain, showRatePercent, showLeftInsteadTotal, autoStatusColor, manualColor, miniOpacity, miniSize, miniPos, hourCounts, problemCounts, lastTrigger })); } catch (_) {}
+    try { localStorage.setItem(saveKey, JSON.stringify({ shift: shiftName, savedAt: now, start, problemTotal, beforeBreak, targetPerHour, selectedBreak, offRemain, showRatePercent, showLeftInsteadTotal, autoStatusColor, manualColor, miniOpacity, miniSize, miniPos, hourCounts, problemCounts, lastTrigger })); } catch (_) {}
   }
 
   loadState(); initCounts();
+
+  function getBreakTimestamps() {
+    if (selectedBreak === 0) return {start: 0, end: 0};
+    const times = night ? [{h:23,m:20}, {h:23,m:50}, {h:0,m:20}, {h:0,m:50}] : [{h:11,m:20}, {h:11,m:50}, {h:12,m:20}, {h:12,m:50}];
+    const t = times[selectedBreak - 1];
+    let d = new Date(); d.setHours(t.h, t.m, 0, 0);
+    if (night) {
+      let ch = new Date().getHours();
+      if (ch >= 17 && t.h < 12) d.setDate(d.getDate() + 1);
+      if (ch < 12 && t.h >= 17) d.setDate(d.getDate() - 1);
+    }
+    let startTs = d.getTime();
+    return { start: startTs, end: startTs + 30 * 60000 };
+  }
+
+  function isBreakActive() {
+    if (selectedBreak === 0) return false;
+    let bt = getBreakTimestamps();
+    let now = Date.now();
+    return now >= bt.start && now < bt.end;
+  }
+
+  function getActiveHours() {
+    let ms = Date.now() - start;
+    if (selectedBreak > 0) {
+      let bt = getBreakTimestamps();
+      let overlap = 0;
+      if (start < bt.end && Date.now() > bt.start) {
+        let startOverlap = Math.max(start, bt.start);
+        let endOverlap = Math.min(Date.now(), bt.end);
+        overlap = Math.max(0, endOverlap - startOverlap);
+      }
+      ms -= overlap;
+    }
+    return ms > 0 ? ms / 3600000 : 0;
+  }
 
   const box = document.createElement('div');
   box.setAttribute('data-reit-counter', 'mini');
@@ -75,7 +112,7 @@
   panel.innerHTML = `
   <div id="mainView" style="width:100%; box-sizing:border-box;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(0,0,0,0.06); padding-bottom:10px;">
-      <div style="font-size:18px; font-weight:900; color:#0f172a; letter-spacing:0.5px; text-transform:uppercase;">C-RET</div>
+      <div id="mainTitle" style="font-size:18px; font-weight:900; color:#0f172a; letter-spacing:0.5px; text-transform:uppercase;">C-RET</div>
       <button id="settingsBtn" title="Ustawienia" style="width:30px; height:30px; border:none; border-radius:8px; background:rgba(0,0,0,0.05); color:#0f172a; font-size:16px; cursor:pointer; transition:background 0.2s;">⚙️</button>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; width:100%; box-sizing:border-box;">
@@ -107,6 +144,14 @@
     </div>
     <div style="background:#ffffff; border:1px solid rgba(0,0,0,0.06); border-radius:10px; padding:12px; margin-bottom:10px; width:100%; box-sizing:border-box;">
       <div style="display:grid; grid-template-columns:105px 1fr; gap:8px; align-items:center; font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; width:100%; box-sizing:border-box;">
+        <label>Wyklucz Przerwę</label>
+        <select id="breakSel" style="width:100%; height:28px; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; background:#fff; font-family:${technoFont}; font-weight:700; box-sizing:border-box; margin:0;">
+          <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>Brak</option>
+          <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>Przerwa 1 (11:20/23:20)</option>
+          <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>Przerwa 2 (11:50/23:50)</option>
+          <option value="3" ${selectedBreak === 3 ? 'selected' : ''}>Przerwa 3 (12:20/00:20)</option>
+          <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>Przerwa 4 (12:50/00:50)</option>
+        </select>
         <label>Pozycja mini</label>
         <select id="pos" style="width:100%; height:28px; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; background:#fff; font-family:${technoFont}; font-weight:700; box-sizing:border-box; margin:0;">
           <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>Dół - Lewo</option>
@@ -160,7 +205,7 @@
   }
   function hourlyTotal() { return hours.reduce((s, h) => s + (parseInt(hourCounts[h]) || 0), 0); }
   function recalcTotal() { total = hourlyTotal() + (parseInt(beforeBreak) || 0); }
-  function currentRate() { const h = (Date.now() - start) / 3600000; return h > 0 ? hourlyTotal() / h : 0; }
+  function currentRate() { const h = getActiveHours(); return h > 0 ? hourlyTotal() / h : 0; }
   function shiftTarget() { return targetPerHour * 10; }
   function markActivity() { lastActivityTime = Date.now(); offLastTick = Date.now(); }
   function miniColor(rate) {
@@ -174,6 +219,12 @@
     const r = showRatePercent ? (targetPerHour > 0 ? ((rate / targetPerHour) * 100).toFixed(0) : '0') + '%/h' : rate.toFixed(2) + '/h';
     return main + ' | ' + r;
   }
+  
+  function updateHeader() {
+    const hdr = panel.querySelector('#mainTitle');
+    if (hdr) hdr.innerHTML = 'C-RET' + (selectedBreak > 0 ? ' <span style="font-size:12px; color:#64748b; font-weight:700;">(Przerwa: ' + selectedBreak + ')</span>' : '');
+  }
+
   function applyMini() {
     const rate = currentRate(); box.innerHTML = miniText(); box.style.color = miniColor(rate);
     const p = panel.querySelector('#miniPreview'); if (p) { p.textContent = miniText(); p.style.color = miniColor(rate); }
@@ -230,18 +281,20 @@
     const max = Math.max(targetPerHour, beforeBreak, ...visibleHours.map((h) => hourCounts[h] || 0), 1);
     let rows = visibleHours.map((h) => {
       const val = hourCounts[h] || 0, bars = Math.min(100, Math.round((val / max) * 100)), good = val >= targetPerHour;
-      return `<div style="display:grid; grid-template-columns:40px 45px 1fr; gap:10px; align-items:center; background:#ffffff; border:1px solid rgba(0,0,0,0.05); border-radius:8px; padding:6px 10px; margin-bottom:6px; border-left:4px solid ${good ? '#22c55e' : '#cbd5e1'}; width:100%; box-sizing:border-box;">
+      return `<div style="display:grid; grid-template-columns:40px 45px 25px 1fr; gap:6px; align-items:center; background:#ffffff; border:1px solid rgba(0,0,0,0.05); border-radius:8px; padding:6px 10px; margin-bottom:6px; border-left:4px solid ${good ? '#22c55e' : '#cbd5e1'}; width:100%; box-sizing:border-box;">
         <b style="font-size:12px; text-align:left; color:#475569;">${h}</b>
         <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="width:100%; padding:4px 6px; border:1px solid #e2e8f0; border-radius:4px; background:#f8fafc; color:#1e293b; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box;">
+        <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;">/${targetPerHour}</div>
         <div style="height:6px; background:#f1f5f9; border-radius:999px; overflow:hidden; width:100%;">
           <div style="height:100%; width:${bars}%; background:${good ? '#22c55e' : '#3b82f6'}; border-radius:999px; transition:width 0.4s ease;"></div>
         </div>
       </div>`;
     }).join('');
     const bbBars = Math.min(100, Math.round((beforeBreak / max) * 100));
-    rows += `<div style="display:grid; grid-template-columns:85px 45px 1fr; gap:10px; align-items:center; background:#f8fafc; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 10px; margin-top:12px; margin-bottom:6px; border-left:4px solid #94a3b8; width:100%; box-sizing:border-box;">
+    rows += `<div style="display:grid; grid-template-columns:85px 45px 25px 1fr; gap:6px; align-items:center; background:#f8fafc; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 10px; margin-top:12px; margin-bottom:6px; border-left:4px solid #94a3b8; width:100%; box-sizing:border-box;">
       <b style="font-size:11px; text-align:left; color:#475569;">Przed przerwą</b>
       <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:100%; padding:4px 6px; border:1px solid #e2e8f0; border-radius:4px; background:#ffffff; color:#1e293b; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box;">
+      <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;"></div>
       <div style="height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; width:100%;">
         <div style="height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#94a3b8; border-radius:999px; transition:width 0.4s ease;"></div>
       </div>
@@ -253,8 +306,15 @@
     recalcTotal(); const now = Date.now();
     if (now - lastActivityTime > grace) { offRemain -= now - offLastTick; if (offRemain < 0) offRemain = 0; }
     offLastTick = now;
-    panel.querySelector('#lt').textContent = lastTrigger; panel.querySelector('#off').textContent = fmt(offRemain);
+    
+    let isBreak = isBreakActive();
+    panel.querySelector('#lt').textContent = isBreak ? 'TRWA PRZERWA...' : lastTrigger;
+    panel.querySelector('#lt').style.color = isBreak ? '#d97706' : '#1e293b';
+    
+    panel.querySelector('#off').textContent = fmt(offRemain);
     panel.querySelector('#pb').textContent = problemTotal; panel.querySelector('#left').textContent = Math.max(0, shiftTarget() - total);
+    
+    updateHeader();
     applyMini(); renderHours(false); 
   }
   
@@ -262,7 +322,18 @@
     const txt = document.body.innerText || '', m = cnt(txt, triggerText), p = cnt(seen, triggerText), pm = cnt(txt, problemText), pp = cnt(seen, problemText), nlpm = cnt(txt, nlpText), nlpp = cnt(seen, nlpText);
     if (nlpm > nlpp) { skipNextPack = true; lastTrigger = 'NLP: POMIŃ NASTĘPNĄ ' + timeNow(); markActivity(); saveState(true); render(); }
     if (pm > pp) addProblem(pm - pp);
-    else if (m > p) { let diff = m - p; if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'POMINIĘTO PO NLP ' + timeNow(); } if (diff > 0) addPacks(diff); }
+    else if (m > p) { 
+      let diff = m - p; 
+      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'POMINIĘTO PO NLP ' + timeNow(); } 
+      if (diff > 0) { 
+        if (isBreakActive()) {
+          lastTrigger = 'PRZERWA - IGNORUJĘ ' + diff;
+          markActivity(); saveState(true); render();
+        } else {
+          addPacks(diff); 
+        }
+      } 
+    }
     seen = txt;
   }
   
@@ -273,6 +344,7 @@
 
   panel.querySelector('#settingsBtn').onclick = () => showSettings(true); panel.querySelector('#backBtn').onclick = () => showSettings(false);
   panel.querySelector('#ratePercent').checked = showRatePercent; panel.querySelector('#leftMode').checked = showLeftInsteadTotal; panel.querySelector('#autoColor').checked = autoStatusColor;
+  panel.querySelector('#breakSel').onchange = (e) => { selectedBreak = parseInt(e.target.value) || 0; saveState(true); updateHeader(); render(); };
   panel.querySelector('#pos').onchange = (e) => { miniPos = e.target.value; applyMiniPos(); saveState(true); };
   panel.querySelector('#ratePercent').onchange = (e) => { showRatePercent = e.target.checked; saveState(true); applyMini(); };
   panel.querySelector('#leftMode').onchange = (e) => { showLeftInsteadTotal = e.target.checked; saveState(true); applyMini(); };
@@ -290,5 +362,5 @@
     }
   });
 
-  render(); scan(); renderHours(true); applyMini();
+  render(); scan(); renderHours(true); applyMini(); updateHeader();
 })();
