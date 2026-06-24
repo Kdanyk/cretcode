@@ -4,7 +4,7 @@
   document.querySelectorAll('[data-reit-counter]').forEach((el) => el.remove());
 
   const saveKey = 'scanCounterV29State';
-  const devFont = 'Consolas, "Courier New", monospace';
+  const technoFont = 'Consolas,"Lucida Console","Courier New",monospace';
   const dayHours = ['7:30', '8:30', '9:30', '10:30', '11:30', '12:30', '13:30', '14:30', '15:30', '16:30', '17:00'];
   const nightHours = ['19:30', '20:30', '21:30', '22:30', '23:30', '00:30', '1:30', '2:30', '3:30', '4:30', '5:00'];
   const currentHour = new Date().getHours();
@@ -17,7 +17,7 @@
   let offRemain = 30 * 60 * 1000, lastActivityTime = Date.now(), offLastTick = Date.now();
   let triggerText = 'Wprowadź pojemnik', problemText = 'Zeskanuj - PROBLEM-SOLVE', nlpText = 'Zeskanuj nowy NLP';
   let skipNextPack = false, showRatePercent = false, showLeftInsteadTotal = false, autoStatusColor = false, ignoreNLP = false;
-  let manualColor = '#333333', miniOpacity = 100, miniSize = 11, miniPos = 'tl', hourCounts = {}, problemCounts = {}, lastSave = 0;
+  let manualColor = '#808080', miniOpacity = 100, miniSize = 11, miniPos = 'tl', hourCounts = {}, problemCounts = {}, lastSave = 0;
 
   function initCounts() { hours.forEach((h) => { if (hourCounts[h] == null) hourCounts[h] = 0; if (problemCounts[h] == null) problemCounts[h] = 0; }); }
 
@@ -35,7 +35,7 @@
       showLeftInsteadTotal = !!s.showLeftInsteadTotal;
       autoStatusColor = !!s.autoStatusColor;
       ignoreNLP = !!s.ignoreNLP;
-      manualColor = s.manualColor || '#333333';
+      manualColor = s.manualColor || '#808080';
       miniPos = s.miniPos || 'tl';
       miniOpacity = Math.min(100, Math.max(0, s.miniOpacity !== undefined ? parseInt(s.miniOpacity) : 100));
       miniSize = Math.min(45, Math.max(10, parseInt(s.miniSize) || 11));
@@ -44,7 +44,7 @@
         hourCounts[h] = Math.max(0, parseInt(s.hourCounts && s.hourCounts[h]) || 0);
         problemCounts[h] = Math.max(0, parseInt(s.problemCounts && s.problemCounts[h]) || 0);
       });
-      lastTrigger = s.lastTrigger || 'INIT_LOAD';
+      lastTrigger = s.lastTrigger || 'PRZYWRÓCONO';
     } catch (_) { initCounts(); }
   }
 
@@ -93,10 +93,9 @@
     return ms > 0 ? ms / 3600000 : 0;
   }
 
-  // MIN WIDGET
   const box = document.createElement('div');
   box.setAttribute('data-reit-counter', 'mini');
-  box.style = 'position:fixed;background:#f3f3f3;border:1px solid #ccc;color:' + manualColor + ';padding:2px 6px;font-size:' + miniSize + 'px;font-family:' + devFont + ';z-index:999999;opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:bold;box-shadow:2px 2px 0px rgba(0,0,0,0.1);';
+  box.style = 'position:fixed;background:transparent;color:' + manualColor + ';padding:2px;font-size:' + miniSize + 'px;font-family:' + technoFont + ';z-index:999999;opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:normal;line-height:1;border:1px solid transparent;';
 
   function applyMiniPos() {
     box.style.top = 'auto'; box.style.bottom = 'auto'; box.style.left = 'auto'; box.style.right = 'auto';
@@ -107,100 +106,82 @@
   }
   applyMiniPos(); document.body.appendChild(box);
 
-  // DEVTOOLS PANEL
   const panel = document.createElement('div');
   panel.setAttribute('data-reit-counter', 'panel');
-  panel.style = 'position:fixed;top:58px;bottom:24px;right:20px;background:#f3f3f3;color:#333;padding:10px;border:1px solid #ccc;z-index:999999;font-family:' + devFont + ';font-size:11px;width:280px;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;box-shadow:4px 4px 0px rgba(0,0,0,0.05);scrollbar-width:thin;transform:translateX(0);opacity:1;pointer-events:auto;transition:transform .2s ease,opacity .2s ease;';
+  // DevTools styling: #f3f3f3 background, thin #ccc borders, no rounded corners, tiny monospace font.
+  panel.style = 'position:fixed;top:58px;bottom:24px;right:20px;background:#f3f3f3;color:#333;padding:4px;border:1px solid #ccc;z-index:999999;font-family:' + technoFont + ';font-size:10px;width:260px;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;transform:translateX(0);opacity:1;pointer-events:auto;transition:none;';
 
   panel.innerHTML = `
   <div id="mainView" style="width:100%; box-sizing:border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:6px; margin-bottom:8px;">
-      <div id="mainTitle" style="font-weight:bold; color:#000; font-size:12px;">> nano banana.js_</div>
-      <button id="settingsBtn" title="Config" style="border:1px solid #aaa; background:#e9e9e9; cursor:pointer; font-family:${devFont}; font-size:10px; padding:2px 6px; font-weight:bold; color:#333;">[CFG]</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; border-bottom:1px solid #ccc; padding-bottom:2px;">
+      <div id="mainTitle" style="font-weight:bold; color:#000;">C-RET_DEV</div>
+      <button id="settingsBtn" title="Config" style="border:1px solid #ccc; background:#e8e8e8; font-family:inherit; font-size:10px; cursor:pointer; padding:0 4px; color:#000;">[⚙]</button>
     </div>
-    
-    <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:8px;">
-      <div style="display:flex; justify-content:space-between;">
-        <span style="color:#666;">TRG:</span>
-        <span id="lt" style="font-weight:bold; color:#000;">-</span>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:4px;">
+      <div style="background:#fff; border:1px solid #ccc; padding:2px;">
+        <div style="color:#666; margin-bottom:1px;">trigger:</div>
+        <div id="lt" style="color:#000; word-break:break-all; line-height:1.1;">-</div>
       </div>
-      <div style="display:flex; justify-content:space-between;">
-        <span style="color:#666;">OFF_TASK:</span>
-        <span id="off" style="font-weight:bold; color:#008000; background:#e8f5e9; padding:0 4px; border:1px solid #b2dfdb;">30:00</span>
-      </div>
-      <div style="display:flex; justify-content:space-between;">
-        <span style="color:#666;">PROBLEM_SLV:</span>
-        <span id="pb" style="font-weight:bold; color:#d14;">0</span>
-      </div>
-      <div style="display:flex; justify-content:space-between;">
-        <span style="color:#666;">REMAINING:</span>
-        <span id="left" style="font-weight:bold; color:#005cc5;">0</span>
+      <div style="background:#fff; border:1px solid #ccc; padding:2px;">
+        <div style="color:#666; margin-bottom:1px;">off_task:</div>
+        <div id="off" style="color:#008000; font-weight:bold;">30:00</div>
       </div>
     </div>
-    
-    <div id="hours" style="display:flex; flex-direction:column; gap:6px; width:100%;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:6px;">
+      <div style="background:#fff; border:1px solid #ccc; padding:2px;">
+        <div style="color:#666; margin-bottom:1px;">problem:</div>
+        <div id="pb" style="color:#d00; font-weight:bold;">0</div>
+      </div>
+      <div style="background:#fff; border:1px solid #ccc; padding:2px;">
+        <div style="color:#666; margin-bottom:1px;">left:</div>
+        <div id="left" style="color:#0000ee; font-weight:bold;">0</div>
+      </div>
+    </div>
+    <div id="hours" style="width:100%; box-sizing:border-box;"></div>
   </div>
-
   <div id="settingsView" style="display:none; width:100%; box-sizing:border-box;">
-    <div style="display:flex; align-items:center; border-bottom:1px solid #ccc; padding-bottom:6px; margin-bottom:10px;">
-      <button id="backBtn" title="Back" style="border:1px solid #aaa; background:#e9e9e9; cursor:pointer; font-family:${devFont}; font-size:10px; padding:2px 6px; margin-right:8px; font-weight:bold;">[ESC]</button>
-      <div style="font-weight:bold; color:#000; font-size:12px;">> nano config.ini</div>
+    <div style="display:flex; align-items:center; margin-bottom:4px; border-bottom:1px solid #ccc; padding-bottom:2px;">
+      <button id="backBtn" title="Back" style="border:1px solid #ccc; background:#e8e8e8; font-family:inherit; font-size:10px; cursor:pointer; padding:0 4px; color:#000; margin-right:4px;">[<]</button>
+      <div style="font-weight:bold; color:#000;">config</div>
     </div>
-    
-    <div style="display:flex; flex-direction:column; gap:8px; border-bottom:1px dashed #ccc; padding-bottom:10px; margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555;">BREAK_SLOT</span>
-        <select id="breakSel" style="width:120px; border:1px solid #aaa; background:#fff; font-family:${devFont}; font-size:10px; padding:1px;">
-          <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>0: NONE</option>
-          <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>1: 11:20/23:20</option>
-          <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>2: 11:50/23:50</option>
-          <option value="3" ${selectedBreak === 3 ? 'selected' : ''}>3: 12:20/00:20</option>
-          <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>4: 12:50/00:50</option>
+    <div style="background:#fff; border:1px solid #ccc; padding:4px; margin-bottom:4px;">
+      <div style="display:grid; grid-template-columns:80px 1fr; gap:2px; align-items:center;">
+        <label>break_excl</label>
+        <select id="breakSel" style="border:1px solid #ccc; background:#fff; font-family:inherit; font-size:10px; height:16px; padding:0;">
+          <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>None</option>
+          <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>Brk 1 (11:20/23:20)</option>
+          <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>Brk 2 (11:50/23:50)</option>
+          <option value="3" ${selectedBreak === 3 ? 'selected' : ''}>Brk 3 (12:20/00:20)</option>
+          <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>Brk 4 (12:50/00:50)</option>
         </select>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555;">HUD_POS</span>
-        <select id="pos" style="width:120px; border:1px solid #aaa; background:#fff; font-family:${devFont}; font-size:10px; padding:1px;">
-          <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>BTM_LEFT</option>
-          <option value="br" ${miniPos === 'br' ? 'selected' : ''}>BTM_RIGHT</option>
-          <option value="tl" ${miniPos === 'tl' ? 'selected' : ''}>TOP_LEFT</option>
-          <option value="tr" ${miniPos === 'tr' ? 'selected' : ''}>TOP_RIGHT</option>
+        <label>mini_pos</label>
+        <select id="pos" style="border:1px solid #ccc; background:#fff; font-family:inherit; font-size:10px; height:16px; padding:0;">
+          <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>B-L</option>
+          <option value="br" ${miniPos === 'br' ? 'selected' : ''}>B-R</option>
+          <option value="tl" ${miniPos === 'tl' ? 'selected' : ''}>T-L</option>
+          <option value="tr" ${miniPos === 'tr' ? 'selected' : ''}>T-R</option>
         </select>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555;">HUD_COLOR</span>
-        <input type="color" id="c" value="${manualColor}" style="width:40px; height:18px; border:1px solid #aaa; padding:0; background:#fff;">
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555;">HUD_SIZE</span>
-        <input type="range" id="s" min="9" max="24" value="${miniSize}" style="width:100px;">
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555;">HUD_ALPHA</span>
-        <input type="range" id="o" min="10" max="100" value="${miniOpacity}" style="width:100px;">
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#555; font-weight:bold;">TARGET/H</span>
-        <input type="text" inputmode="numeric" id="target" value="${targetPerHour}" style="width:40px; border:1px solid #aaa; background:#fff; font-family:${devFont}; font-size:11px; text-align:right; padding:1px 4px; color:#000;">
+        <label>mini_color</label>
+        <input type="color" id="c" value="${manualColor}" style="border:1px solid #ccc; height:16px; width:100%; padding:0; background:#fff;">
+        <label>mini_size</label>
+        <input type="range" id="s" min="9" max="24" value="${miniSize}" style="width:100%; margin:0;">
+        <label>opacity</label>
+        <input type="range" id="o" min="0" max="100" value="${miniOpacity}" style="width:100%; margin:0;">
+        <label>tgt/hour</label>
+        <input type="text" inputmode="numeric" id="target" value="${targetPerHour}" style="border:1px solid #ccc; background:#fff; font-family:inherit; font-size:10px; width:100%; height:16px; padding:0 2px; box-sizing:border-box;">
       </div>
     </div>
-    
-    <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
-      <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#333;">
-        [IGNORE_NLP] <input id="ignoreNLP" type="checkbox" style="margin:0;" ${ignoreNLP ? 'checked' : ''}>
-      </label>
-      <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#333;">
-        [RATE_PCT_MODE] <input id="ratePercent" type="checkbox" style="margin:0;" ${showRatePercent ? 'checked' : ''}>
-      </label>
-      <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#333;">
-        [LEFT_MODE] <input id="leftMode" type="checkbox" style="margin:0;" ${showLeftInsteadTotal ? 'checked' : ''}>
-      </label>
-      <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#333;">
-        [AUTO_COLOR] <input id="autoColor" type="checkbox" style="margin:0;" ${autoStatusColor ? 'checked' : ''}>
-      </label>
+    <div style="background:#fff; border:1px solid #ccc; padding:4px; margin-bottom:4px;">
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; cursor:pointer;">ignore_nlp <input id="ignoreNLP" type="checkbox" style="margin:0;" ${ignoreNLP ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; cursor:pointer;">rate_%/h <input id="ratePercent" type="checkbox" style="margin:0;" ${showRatePercent ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; cursor:pointer;">left_mode <input id="leftMode" type="checkbox" style="margin:0;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">auto_color <input id="autoColor" type="checkbox" style="margin:0;" ${autoStatusColor ? 'checked' : ''}></label>
     </div>
-    
-    <button id="resetOff" style="width:100%; padding:6px; border:1px solid #bcaaa4; background:#facc15; color:#000; font-family:${devFont}; font-size:11px; font-weight:bold; cursor:pointer; transition:background 0.1s;">[ EXEC: RESET_OFF_TASK ]</button>
+    <div style="background:#fff; border:1px solid #ccc; padding:4px; margin-bottom:4px;">
+      <div style="color:#666; margin-bottom:2px;">preview:</div>
+      <div id="miniPreview" style="background:#f3f3f3; border:1px solid #ccc; padding:2px; text-align:center; color:#000;">0 | 0.00/h</div>
+    </div>
+    <button id="resetOff" style="width:100%; border:1px solid #ccc; background:#e8e8e8; font-family:inherit; font-size:10px; cursor:pointer; padding:4px; color:#000;">[ reset_off_task ]</button>
   </div>`;
 
   document.body.appendChild(panel);
@@ -233,7 +214,7 @@
   function miniColor(rate) {
     if (!autoStatusColor) return manualColor;
     const pct = targetPerHour > 0 ? rate / targetPerHour : 0;
-    return pct >= 1 ? '#008000' : pct >= 0.85 ? '#d97706' : '#d14';
+    return pct >= 1 ? '#008000' : pct >= 0.85 ? '#b8860b' : '#d00';
   }
   function miniText() {
     const rate = currentRate(), left = Math.max(0, shiftTarget() - total);
@@ -244,18 +225,19 @@
   
   function updateHeader() {
     const hdr = panel.querySelector('#mainTitle');
-    if (hdr) hdr.innerHTML = '> nano banana.js_' + (selectedBreak > 0 ? ' <span style="font-size:10px; color:#888; font-weight:normal;">[BRK:' + selectedBreak + ']</span>' : '');
+    if (hdr) hdr.innerHTML = 'C-RET_DEV' + (selectedBreak > 0 ? ' <span style="color:#666;">[B:' + selectedBreak + ']</span>' : '');
   }
 
   function applyMini() {
     const rate = currentRate(); box.innerHTML = miniText(); box.style.color = miniColor(rate);
+    const p = panel.querySelector('#miniPreview'); if (p) { p.textContent = miniText(); p.style.color = miniColor(rate); }
   }
   
   function addPacks(n) { 
     n = parseInt(n) || 0; if (n <= 0) return; 
     loadState();
     const slot = getSlot(); hourCounts[slot] += n; 
-    recalcTotal(); lastTrigger = 'SYS:+' + n + ' @ ' + timeNow(); 
+    recalcTotal(); lastTrigger = 'MANUAL_+' + n + ' ' + timeNow(); 
     markActivity(); saveState(true); render(); 
   }
   function removePack() { 
@@ -263,7 +245,7 @@
     const slot = getSlot(); 
     if (hourlyTotal() > 0) { 
         hourCounts[slot] = Math.max(0, hourCounts[slot] - 1); 
-        recalcTotal(); lastTrigger = 'USR:-1 @ ' + timeNow(); 
+        recalcTotal(); lastTrigger = 'MANUAL_-1 ' + timeNow(); 
         saveState(true); render(); 
     } 
   }
@@ -271,66 +253,61 @@
     n = parseInt(n) || 0; if (n <= 0) return; 
     loadState();
     problemTotal += n; problemCounts[getSlot()] += n; 
-    lastTrigger = 'ERR:PROB @ ' + timeNow(); markActivity(); saveState(true); render(); 
+    lastTrigger = 'PROBLEM ' + timeNow(); markActivity(); saveState(true); render(); 
   }
   
   function bindCountInputs() {
     panel.querySelectorAll('.hc').forEach((inp) => {
-      inp.oninput = (e) => { hourCounts[e.target.getAttribute('data-h')] = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); applyMini(); };
+      inp.oninput = (e) => { hourCounts[e.target.getAttribute('data-h')] = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); };
       inp.onblur = (e) => { 
           let newVal = Math.max(0, parseInt(e.target.value) || 0);
           loadState();
           hourCounts[e.target.getAttribute('data-h')] = newVal;
-          lastTrigger = 'USR:EDIT @ ' + timeNow(); saveState(true); renderHours(true); render(); 
+          lastTrigger = 'MANUAL_EDT ' + timeNow(); saveState(true); renderHours(true); render(); 
       };
     });
     const bb = panel.querySelector('#beforeBreak');
     if (bb) {
-      bb.oninput = (e) => { beforeBreak = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); applyMini(); };
+      bb.oninput = (e) => { beforeBreak = Math.max(0, parseInt(e.target.value) || 0); recalcTotal(); updateTop(); };
       bb.onblur = (e) => { 
           let newVal = Math.max(0, parseInt(e.target.value) || 0);
           loadState();
           beforeBreak = newVal;
-          lastTrigger = 'USR:EDIT @ ' + timeNow(); saveState(true); renderHours(true); render(); 
+          lastTrigger = 'MANUAL_EDT ' + timeNow(); saveState(true); renderHours(true); render(); 
       };
     }
   }
-
   function renderHours(force) {
     const active = document.activeElement;
     if (!force && active && panel.contains(active) && (active.classList.contains('hc') || active.id === 'beforeBreak')) return;
     const visibleHours = night ? nightHours : dayHours;
     const max = Math.max(targetPerHour, beforeBreak, ...visibleHours.map((h) => hourCounts[h] || 0), 1);
-    
     let rows = visibleHours.map((h, i) => {
       const isLastSlot = i === visibleHours.length - 1;
       const slotTarget = isLastSlot ? Math.round(targetPerHour / 2) : targetPerHour;
       const cumTarget = (i * targetPerHour) + slotTarget;
       const val = hourCounts[h] || 0, bars = Math.min(100, Math.round((val / max) * 100)), good = val >= slotTarget;
-      
-      return `<div style="display:flex; flex-direction:column; gap:2px; margin-bottom:4px; width:100%;">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:4px;">
-          <span style="width:40px; color:#555; font-weight:bold;">[${h}]</span>
-          <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="flex-grow:1; padding:0 2px; border:none; border-bottom:1px solid #ccc; background:transparent; font-family:${devFont}; font-size:11px; text-align:right; outline:none; color:#000;" onfocus="this.style.borderBottom='1px solid #333'" onblur="this.style.borderBottom='1px solid #ccc'">
-          <span style="width:35px; color:#888; text-align:left;">/${cumTarget}</span>
-        </div>
-        <div style="height:2px; background:#ddd; width:100%; position:relative;">
-          <div style="position:absolute; top:0; left:0; height:100%; width:${bars}%; background:${good ? '#008000' : '#005cc5'}; transition:width 0.3s ease;"></div>
+      return `<div style="display:flex; align-items:center; background:#fff; border:1px solid #ccc; padding:2px; margin-bottom:2px; border-left:2px solid ${good ? '#008000' : '#ccc'}; width:100%; box-sizing:border-box;">
+        <div style="width:36px; color:#333;">${h}</div>
+        <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="width:28px; padding:0; border:1px solid #ccc; background:#fafafa; color:#000; text-align:center; font-family:inherit; font-size:10px; outline:none; margin:0 4px;">
+        <div style="width:28px; color:#666;">/${cumTarget}</div>
+        <div style="flex-grow:1; margin-left:2px;">
+          <div style="height:2px; background:#e8e8e8; width:100%;">
+            <div style="height:100%; width:${bars}%; background:${good ? '#008000' : '#0000ee'}; transition:none;"></div>
+          </div>
         </div>
       </div>`;
     }).join('');
-    
-    rows += `<div style="display:flex; flex-direction:column; gap:2px; margin-top:8px; border-top:1px dashed #ccc; padding-top:6px; width:100%;">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:4px;">
-        <span style="width:65px; color:#888;">PRE_BREAK</span>
-        <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="flex-grow:1; padding:0 2px; border:none; border-bottom:1px solid #ccc; background:transparent; font-family:${devFont}; font-size:11px; text-align:right; outline:none; color:#000;" onfocus="this.style.borderBottom='1px solid #333'" onblur="this.style.borderBottom='1px solid #ccc'">
-        <span style="width:35px;"></span>
-      </div>
-      <div style="height:2px; background:#ddd; width:100%; position:relative;">
-        <div style="position:absolute; top:0; left:0; height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#888; transition:width 0.3s ease;"></div>
+    const bbBars = Math.min(100, Math.round((beforeBreak / max) * 100));
+    rows += `<div style="display:flex; align-items:center; background:#fff; border:1px solid #ccc; padding:2px; margin-top:4px; margin-bottom:2px; border-left:2px solid #666; width:100%; box-sizing:border-box;">
+      <div style="width:68px; color:#333;">pre_brk</div>
+      <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:28px; padding:0; border:1px solid #ccc; background:#fafafa; color:#000; text-align:center; font-family:inherit; font-size:10px; outline:none; margin:0 4px;">
+      <div style="flex-grow:1; margin-left:2px;">
+        <div style="height:2px; background:#e8e8e8; width:100%;">
+          <div style="height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#666; transition:none;"></div>
+        </div>
       </div>
     </div>`;
-    
     panel.querySelector('#hours').innerHTML = rows; bindCountInputs();
   }
   
@@ -340,8 +317,8 @@
     offLastTick = now;
     
     let isBreak = isBreakActive();
-    panel.querySelector('#lt').textContent = isBreak ? 'SYS: PAUSED' : lastTrigger;
-    panel.querySelector('#lt').style.color = isBreak ? '#d97706' : '#000';
+    panel.querySelector('#lt').textContent = isBreak ? 'BREAK_ACTIVE' : lastTrigger;
+    panel.querySelector('#lt').style.color = isBreak ? '#b8860b' : '#000';
     
     panel.querySelector('#off').textContent = fmt(offRemain);
     panel.querySelector('#pb').textContent = problemTotal; panel.querySelector('#left').textContent = Math.max(0, shiftTarget() - total);
@@ -355,17 +332,17 @@
     
     if (!ignoreNLP && nlpm > nlpp) { 
         skipNextPack = true; 
-        lastTrigger = 'NLP:SKIP @ ' + timeNow(); 
+        lastTrigger = 'NLP_SKIP_NEXT ' + timeNow(); 
         markActivity(); saveState(true); render(); 
     }
     
     if (pm > pp) addProblem(pm - pp);
     else if (m > p) { 
       let diff = m - p; 
-      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'SYS:IGNORE_NLP @ ' + timeNow(); } 
+      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'SKIPPED_AFT_NLP ' + timeNow(); } 
       if (diff > 0) { 
         if (isBreakActive()) {
-          lastTrigger = 'BRK:IGNR(' + diff + ')';
+          lastTrigger = 'BRK_IGNORING_' + diff;
           markActivity(); saveState(true); render();
         } else {
           addPacks(diff); 
@@ -375,7 +352,7 @@
     seen = txt;
   }
   
-  function toggleUI() { open = !open; panel.style.transform = open ? 'translateX(0)' : 'translateX(295px)'; panel.style.opacity = open ? '1' : '0.5'; panel.style.pointerEvents = open ? 'auto' : 'none'; }
+  function toggleUI() { open = !open; panel.style.transform = open ? 'translateX(0)' : 'translateX(280px)'; panel.style.opacity = open ? '1' : '0'; panel.style.pointerEvents = open ? 'auto' : 'none'; }
   function showSettings(v) { panel.querySelector('#mainView').style.display = v ? 'none' : 'block'; panel.querySelector('#settingsView').style.display = v ? 'block' : 'none'; applyMini(); }
 
   setInterval(scan, 1000); setInterval(render, 1000); window.addEventListener('beforeunload', () => saveState(true)); box.onclick = toggleUI;
