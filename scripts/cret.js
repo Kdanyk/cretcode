@@ -114,7 +114,6 @@
 
   const panel = document.createElement('div');
   panel.setAttribute('data-reit-counter', 'panel');
-  // NATIVE LIGHT THEME STYLES (AMAZON-LIKE)
   panel.style = 'position:fixed;top:58px;bottom:24px;right:20px;background:#ffffff;color:#0f1111;padding:16px;border-radius:8px;border:1px solid #d5d9d9;z-index:999999;font-family:' + nativeFont + ';width:340px;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;box-shadow:0 4px 12px rgba(0,0,0,0.15);scrollbar-width:thin;transform:translateX(0);opacity:1;pointer-events:auto;transition:transform .3s ease,opacity .3s ease';
 
   panel.innerHTML = `
@@ -223,7 +222,7 @@
   function miniColor(rate) {
     if (!autoStatusColor) return manualColor;
     const pct = targetPerHour > 0 ? rate / targetPerHour : 0;
-    return pct >= 1 ? '#007600' : pct >= 0.85 ? '#e77600' : '#c40000'; // Amazon Native Colors (Green, Orange, Red)
+    return pct >= 1 ? '#007600' : pct >= 0.85 ? '#e77600' : '#c40000';
   }
   
   function miniText() {
