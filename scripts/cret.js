@@ -4,7 +4,7 @@
   document.querySelectorAll('[data-reit-counter]').forEach((el) => el.remove());
 
   const saveKey = 'scanCounterV29State';
-  const technoFont = 'Consolas,"Lucida Console","Courier New",monospace';
+  const nativeFont = '"Amazon Ember", Arial, sans-serif';
   const dayHours = ['7:30', '8:30', '9:30', '10:30', '11:30', '12:30', '13:30', '14:30', '15:30', '16:30', '17:00'];
   const nightHours = ['19:30', '20:30', '21:30', '22:30', '23:30', '00:30', '1:30', '2:30', '3:30', '4:30', '5:00'];
   const currentHour = new Date().getHours();
@@ -22,7 +22,7 @@
   let offRemain = 30 * 60 * 1000, lastActivityTime = Date.now(), offLastTick = Date.now();
   let triggerText = 'Wprowadź pojemnik', problemText = 'Zeskanuj - PROBLEM-SOLVE', nlpText = 'Zeskanuj nowy NLP';
   let skipNextPack = false, showRatePercent = false, showLeftInsteadTotal = false, autoStatusColor = false, ignoreNLP = false;
-  let manualColor = '#8b5cf6', miniOpacity = 100, miniSize = 14, miniPos = 'tl', hourCounts = {}, problemCounts = {}, lastSave = 0;
+  let manualColor = '#0f1111', miniOpacity = 100, miniSize = 13, miniPos = 'tl', hourCounts = {}, problemCounts = {}, lastSave = 0;
 
   function initCounts() { hours.forEach((h) => { if (hourCounts[h] == null) hourCounts[h] = 0; if (problemCounts[h] == null) problemCounts[h] = 0; }); }
 
@@ -41,10 +41,10 @@
       autoStatusColor = !!s.autoStatusColor;
       ignoreNLP = !!s.ignoreNLP;
       autoLpnEnabled = s.autoLpnEnabled !== undefined ? !!s.autoLpnEnabled : true;
-      manualColor = s.manualColor || '#8b5cf6';
+      manualColor = s.manualColor || '#0f1111';
       miniPos = s.miniPos || 'tl';
       miniOpacity = Math.min(100, Math.max(0, s.miniOpacity !== undefined ? parseInt(s.miniOpacity) : 100));
-      miniSize = Math.min(45, Math.max(10, parseInt(s.miniSize) || 14));
+      miniSize = Math.min(45, Math.max(10, parseInt(s.miniSize) || 13));
       hourCounts = {}; problemCounts = {};
       hours.forEach((h) => {
         hourCounts[h] = Math.max(0, parseInt(s.hourCounts && s.hourCounts[h]) || 0);
@@ -101,7 +101,7 @@
 
   const box = document.createElement('div');
   box.setAttribute('data-reit-counter', 'mini');
-  box.style = 'position:fixed;background:rgba(15, 20, 35, 0.9);color:' + manualColor + ';padding:6px 12px;font-size:' + miniSize + 'px;font-family:' + technoFont + ';z-index:999999;border-radius:12px;border:1px solid rgba(139, 92, 246, 0.5);box-shadow:0 0 15px rgba(139, 92, 246, 0.3);opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:900;letter-spacing:0;backdrop-filter:blur(8px);';
+  box.style = 'position:fixed;background:#ffffff;color:' + manualColor + ';padding:4px 8px;font-size:' + miniSize + 'px;font-family:' + nativeFont + ';z-index:999999;border-radius:4px;border:1px solid #d5d9d9;box-shadow:0 2px 5px rgba(0,0,0,0.1);opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:bold;letter-spacing:0;';
 
   function applyMiniPos() {
     box.style.top = 'auto'; box.style.bottom = 'auto'; box.style.left = 'auto'; box.style.right = 'auto';
@@ -114,46 +114,47 @@
 
   const panel = document.createElement('div');
   panel.setAttribute('data-reit-counter', 'panel');
-  
-  panel.style = 'position:fixed;top:58px;bottom:24px;right:20px;background:rgba(15, 20, 35, 0.95);color:#f1f5f9;padding:16px;border-radius:16px;border:1px solid rgba(139, 92, 246, 0.4);z-index:999999;font-family:' + technoFont + ';width:350px;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;backdrop-filter:blur(15px);box-shadow:0 0 30px rgba(139, 92, 246, 0.2);scrollbar-width:thin;transform:translateX(0);opacity:1;pointer-events:auto;transition:transform .35s cubic-bezier(0.4, 0, 0.2, 1),opacity .35s ease';
+  // NATIVE LIGHT THEME STYLES (AMAZON-LIKE)
+  panel.style = 'position:fixed;top:58px;bottom:24px;right:20px;background:#ffffff;color:#0f1111;padding:16px;border-radius:8px;border:1px solid #d5d9d9;z-index:999999;font-family:' + nativeFont + ';width:340px;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;box-shadow:0 4px 12px rgba(0,0,0,0.15);scrollbar-width:thin;transform:translateX(0);opacity:1;pointer-events:auto;transition:transform .3s ease,opacity .3s ease';
 
   panel.innerHTML = `
   <div id="mainView" style="width:100%; box-sizing:border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-      <div id="mainTitle" style="font-size:18px; font-weight:900; color:#f8fafc; letter-spacing:1px; text-transform:uppercase; text-shadow:0 0 8px rgba(139, 92, 246, 0.8);">C-RET</div>
-      <button id="settingsBtn" title="Ustawienia" style="width:30px; height:30px; border:none; border-radius:8px; background:rgba(255,255,255,0.1); color:#f8fafc; font-size:16px; cursor:pointer; transition:background 0.2s;">⚙️</button>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; width:100%; box-sizing:border-box;">
-      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px;">
-        <div style="font-size:10px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px; font-weight:700;">Trigger</div>
-        <div id="lt" style="font-size:12px; font-weight:700; color:#cbd5e1; word-break:break-all; line-height:1.2;">-</div>
-      </div>
-      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px;">
-        <div style="font-size:10px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px; font-weight:700;">Off Task</div>
-        <div id="off" style="font-size:18px; font-weight:900; color:#4ade80; text-shadow:0 0 10px rgba(74, 222, 128, 0.4);">30:00</div>
-      </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #e7e7e7; padding-bottom:8px;">
+      <div id="mainTitle" style="font-size:16px; font-weight:bold; color:#0f1111;">C-RET Dashboard</div>
+      <button id="settingsBtn" title="Ustawienia" style="width:28px; height:28px; border:1px solid transparent; border-radius:4px; background:transparent; color:#555; font-size:14px; cursor:pointer; transition:background 0.2s;">⚙️</button>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; width:100%; box-sizing:border-box;">
-      <div style="background:linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8)); border:1px solid rgba(239, 68, 68, 0.5); color:white; padding:12px 8px; border-radius:10px; text-align:center; text-transform:uppercase; box-shadow:0 0 15px rgba(239, 68, 68, 0.3);">
-        <div style="font-size:10px; font-weight:900; opacity:0.9; margin-bottom:2px;">Problem</div>
-        <div id="pb" style="font-size:22px; font-weight:900;">0</div>
+      <div style="background:#f3f3f3; border:1px solid #e7e7e7; border-radius:4px; padding:8px;">
+        <div style="font-size:11px; color:#555; margin-bottom:2px;">Ostatni trigger</div>
+        <div id="lt" style="font-size:12px; font-weight:bold; color:#0f1111; word-break:break-all; line-height:1.2;">-</div>
       </div>
-      <div style="background:linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(79, 70, 229, 0.8)); border:1px solid rgba(139, 92, 246, 0.5); color:white; padding:12px 8px; border-radius:10px; text-align:center; text-transform:uppercase; box-shadow:0 0 15px rgba(139, 92, 246, 0.3);">
-        <div style="font-size:10px; font-weight:900; opacity:0.9; margin-bottom:2px;">Pozostało</div>
-        <div id="left" style="font-size:22px; font-weight:900;">0</div>
+      <div style="background:#f3f3f3; border:1px solid #e7e7e7; border-radius:4px; padding:8px;">
+        <div style="font-size:11px; color:#555; margin-bottom:2px;">Off Task</div>
+        <div id="off" style="font-size:16px; font-weight:bold; color:#007600;">30:00</div>
       </div>
     </div>
-    <div id="hours" style="margin-top:8px; padding-bottom:10px; width:100%; box-sizing:border-box;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; width:100%; box-sizing:border-box;">
+      <div style="background:#fff4f4; border:1px solid #d00000; color:#c40000; padding:10px 8px; border-radius:4px; text-align:center;">
+        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Problem</div>
+        <div id="pb" style="font-size:20px; font-weight:bold;">0</div>
+      </div>
+      <div style="background:#f0f8fa; border:1px solid #007185; color:#007185; padding:10px 8px; border-radius:4px; text-align:center;">
+        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Pozostało</div>
+        <div id="left" style="font-size:20px; font-weight:bold;">0</div>
+      </div>
+    </div>
+    <div style="font-size:13px; font-weight:bold; margin-bottom:6px; color:#0f1111;">Godziny pracy</div>
+    <div id="hours" style="width:100%; box-sizing:border-box;"></div>
   </div>
   <div id="settingsView" style="display:none; width:100%; box-sizing:border-box;">
-    <div style="display:flex; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-      <button id="backBtn" title="Powrót" style="width:30px; height:30px; border:none; border-radius:8px; background:rgba(255,255,255,0.1); color:#f8fafc; font-size:18px; cursor:pointer; margin-right:10px; display:flex; align-items:center; justify-content:center;">‹</button>
-      <div style="font-size:16px; font-weight:900; color:#f8fafc; text-transform:uppercase; letter-spacing:1px; text-shadow:0 0 8px rgba(139, 92, 246, 0.8);">Ustawienia</div>
+    <div style="display:flex; align-items:center; margin-bottom:12px; border-bottom:1px solid #e7e7e7; padding-bottom:8px;">
+      <button id="backBtn" title="Powrót" style="width:28px; height:28px; border:1px solid #d5d9d9; border-radius:4px; background:#f3f4f6; color:#0f1111; font-size:16px; cursor:pointer; margin-right:8px; display:flex; align-items:center; justify-content:center;">‹</button>
+      <div style="font-size:16px; font-weight:bold; color:#0f1111;">Ustawienia</div>
     </div>
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin-bottom:10px; width:100%; box-sizing:border-box;">
-      <div style="display:grid; grid-template-columns:105px 1fr; gap:8px; align-items:center; font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; width:100%; box-sizing:border-box;">
+    <div style="background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:10px; width:100%; box-sizing:border-box;">
+      <div style="display:grid; grid-template-columns:105px 1fr; gap:8px; align-items:center; font-size:12px; font-weight:normal; color:#0f1111; width:100%; box-sizing:border-box;">
         <label>Wyklucz Przerwę</label>
-        <select id="breakSel" style="width:100%; height:28px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer; background:rgba(0,0,0,0.4); color:#f8fafc; font-family:${technoFont}; font-weight:700; box-sizing:border-box; margin:0; outline:none;">
+        <select id="breakSel" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; margin:0; outline:none;">
           <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>Brak</option>
           <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>Przerwa 1 (11:20/23:20)</option>
           <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>Przerwa 2 (11:50/23:50)</option>
@@ -161,34 +162,34 @@
           <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>Przerwa 4 (12:50/00:50)</option>
         </select>
         <label>Pozycja mini</label>
-        <select id="pos" style="width:100%; height:28px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer; background:rgba(0,0,0,0.4); color:#f8fafc; font-family:${technoFont}; font-weight:700; box-sizing:border-box; margin:0; outline:none;">
+        <select id="pos" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; margin:0; outline:none;">
           <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>Dół - Lewo</option>
           <option value="br" ${miniPos === 'br' ? 'selected' : ''}>Dół - Prawo</option>
           <option value="tl" ${miniPos === 'tl' ? 'selected' : ''}>Góra - Lewo</option>
           <option value="tr" ${miniPos === 'tr' ? 'selected' : ''}>Góra - Prawo</option>
         </select>
         <label>Kolor mini</label>
-        <input type="color" id="c" value="${manualColor}" style="width:100%; height:28px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer; background:rgba(0,0,0,0.4); padding:0; box-sizing:border-box; margin:0;">
+        <input type="color" id="c" value="${manualColor}" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; padding:0; box-sizing:border-box; margin:0;">
         <label>Rozmiar mini</label>
-        <input type="range" id="s" min="10" max="45" value="${miniSize}" style="width:100%; accent-color:#8b5cf6; box-sizing:border-box; margin:0;">
+        <input type="range" id="s" min="10" max="45" value="${miniSize}" style="width:100%; accent-color:#007185; box-sizing:border-box; margin:0;">
         <label>Widoczność</label>
-        <input type="range" id="o" min="0" max="100" value="${miniOpacity}" style="width:100%; accent-color:#8b5cf6; box-sizing:border-box; margin:0;">
+        <input type="range" id="o" min="0" max="100" value="${miniOpacity}" style="width:100%; accent-color:#007185; box-sizing:border-box; margin:0;">
         <label>Reit/h cel</label>
-        <input type="text" inputmode="numeric" id="target" value="${targetPerHour}" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:#f8fafc; font-family:${technoFont}; font-weight:900; box-sizing:border-box; outline:none; margin:0;">
+        <input type="text" inputmode="numeric" id="target" value="${targetPerHour}" style="width:100%; padding:4px 8px; border-radius:3px; border:1px solid #8d9096; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; outline:none; margin:0;">
       </div>
     </div>
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin-bottom:10px; width:100%; box-sizing:border-box;">
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#cbd5e1; cursor:pointer;">Ignoruj NLP <input id="ignoreNLP" type="checkbox" style="width:18px; height:18px; accent-color:#ef4444; margin:0; cursor:pointer;" ${ignoreNLP ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#cbd5e1; cursor:pointer;">Tempo % / h <input id="ratePercent" type="checkbox" style="width:18px; height:18px; accent-color:#8b5cf6; margin:0; cursor:pointer;" ${showRatePercent ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#cbd5e1; cursor:pointer;">Pozostało zamiast sumy <input id="leftMode" type="checkbox" style="width:18px; height:18px; accent-color:#8b5cf6; margin:0; cursor:pointer;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#cbd5e1; cursor:pointer;">Auto-kolor tempa <input id="autoColor" type="checkbox" style="width:18px; height:18px; accent-color:#8b5cf6; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:900; text-transform:uppercase; color:#cbd5e1; cursor:pointer;">Auto-Przypisz LPN <input id="autoLpnToggle" type="checkbox" style="width:18px; height:18px; accent-color:#10b981; margin:0; cursor:pointer;" ${autoLpnEnabled ? 'checked' : ''}></label>
+    <div style="background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:10px; width:100%; box-sizing:border-box;">
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Ignoruj NLP <input id="ignoreNLP" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${ignoreNLP ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Tempo % / h <input id="ratePercent" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showRatePercent ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Pozostało zamiast sumy <input id="leftMode" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Auto-kolor tempa <input id="autoColor" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#0f1111; cursor:pointer; font-weight:bold;">Auto-Przypisz LPN <input id="autoLpnToggle" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoLpnEnabled ? 'checked' : ''}></label>
     </div>
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin-bottom:16px; width:100%; box-sizing:border-box;">
-      <div style="font-size:10px; font-weight:900; text-transform:uppercase; margin-bottom:8px; color:#94a3b8;">Podgląd mini widgetu</div>
-      <div id="miniPreview" style="font-size:20px; font-weight:900; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; text-align:center; color:#f8fafc; width:100%; box-sizing:border-box; text-shadow:0 0 5px rgba(255,255,255,0.3);">0 | 0.00/h</div>
+    <div style="background:#fff; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:12px; width:100%; box-sizing:border-box;">
+      <div style="font-size:11px; color:#555; margin-bottom:4px;">Podgląd mini widgetu</div>
+      <div id="miniPreview" style="font-size:14px; font-weight:bold; background:#fff; border:1px solid #d5d9d9; border-radius:4px; padding:6px; text-align:center; color:#0f1111; width:100%; box-sizing:border-box;">0 | 0.00/h</div>
     </div>
-    <button id="resetOff" style="width:100%; padding:10px; border:none; border-radius:8px; background:linear-gradient(135deg, #eab308, #ca8a04); color:#fff; font-family:${technoFont}; font-size:13px; font-weight:900; cursor:pointer; text-transform:uppercase; transition:opacity 0.2s; margin-bottom:14px; box-sizing:border-box; box-shadow:0 0 15px rgba(234, 179, 8, 0.4);">Reset Off Task</button>
+    <button id="resetOff" style="width:100%; padding:8px; border:none; border-radius:4px; background:#e7e7e7; color:#0f1111; font-family:${nativeFont}; font-size:13px; font-weight:bold; cursor:pointer; border:1px solid #d5d9d9; box-sizing:border-box; margin-bottom:8px;">Zresetuj Off Task</button>
   </div>`;
 
   document.body.appendChild(panel);
@@ -218,11 +219,13 @@
   function currentRate() { const h = getActiveHours(); return h > 0 ? hourlyTotal() / h : 0; }
   function shiftTarget() { return (targetPerHour * 10) + Math.round(targetPerHour / 2); }
   function markActivity() { lastActivityTime = Date.now(); offLastTick = Date.now(); }
+  
   function miniColor(rate) {
     if (!autoStatusColor) return manualColor;
     const pct = targetPerHour > 0 ? rate / targetPerHour : 0;
-    return pct >= 1 ? '#4ade80' : pct >= 0.85 ? '#fbbf24' : '#ef4444';
+    return pct >= 1 ? '#007600' : pct >= 0.85 ? '#e77600' : '#c40000'; // Amazon Native Colors (Green, Orange, Red)
   }
+  
   function miniText() {
     const rate = currentRate(), left = Math.max(0, shiftTarget() - total);
     const main = showLeftInsteadTotal ? String(left) : String(total);
@@ -232,7 +235,7 @@
   
   function updateHeader() {
     const hdr = panel.querySelector('#mainTitle');
-    if (hdr) hdr.innerHTML = 'C-RET' + (selectedBreak > 0 ? ' <span style="font-size:12px; color:#94a3b8; font-weight:700; text-shadow:none;">(Przerwa: ' + selectedBreak + ')</span>' : '');
+    if (hdr) hdr.innerHTML = 'C-RET Dashboard' + (selectedBreak > 0 ? ' <span style="font-size:11px; color:#555; font-weight:normal; margin-left:6px;">(Przerwa: ' + selectedBreak + ')</span>' : '');
   }
 
   function applyMini() {
@@ -295,22 +298,22 @@
       const slotTarget = isLastSlot ? Math.round(targetPerHour / 2) : targetPerHour;
       const cumTarget = (i * targetPerHour) + slotTarget;
       const val = hourCounts[h] || 0, bars = Math.min(100, Math.round((val / max) * 100)), good = val >= slotTarget;
-      return `<div style="display:grid; grid-template-columns:40px 45px 30px 1fr; gap:6px; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 10px; margin-bottom:6px; border-left:4px solid ${good ? '#4ade80' : '#64748b'}; width:100%; box-sizing:border-box;">
-        <b style="font-size:12px; text-align:left; color:#cbd5e1;">${h}</b>
-        <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="width:100%; padding:4px 6px; border:1px solid rgba(255,255,255,0.15); border-radius:4px; background:rgba(0,0,0,0.3); color:#f8fafc; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box; transition:border 0.2s;">
-        <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;">/${cumTarget}</div>
-        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:999px; overflow:hidden; width:100%;">
-          <div style="height:100%; width:${bars}%; background:${good ? '#4ade80' : '#8b5cf6'}; box-shadow:0 0 8px ${good ? '#4ade80' : '#8b5cf6'}; border-radius:999px; transition:width 0.4s ease;"></div>
+      return `<div style="display:grid; grid-template-columns:40px 45px 35px 1fr; gap:6px; align-items:center; background:#fff; border:1px solid #e7e7e7; border-radius:4px; padding:4px 8px; margin-bottom:4px; border-left:4px solid ${good ? '#007600' : '#e7e7e7'}; width:100%; box-sizing:border-box;">
+        <span style="font-size:12px; color:#0f1111;">${h}</span>
+        <input class="hc" data-h="${h}" type="text" inputmode="numeric" value="${val}" style="width:100%; padding:2px 4px; border:1px solid #8d9096; border-radius:3px; background:#fff; color:#0f1111; text-align:center; font-family:${nativeFont}; box-sizing:border-box; outline:none; font-size:12px;">
+        <div style="font-size:11px; color:#555; text-align:left;">/${cumTarget}</div>
+        <div style="height:6px; background:#e3e8ee; border-radius:3px; overflow:hidden; width:100%;">
+          <div style="height:100%; width:${bars}%; background:${good ? '#007600' : '#007185'}; border-radius:3px; transition:width 0.4s ease;"></div>
         </div>
       </div>`;
     }).join('');
     const bbBars = Math.min(100, Math.round((beforeBreak / max) * 100));
-    rows += `<div style="display:grid; grid-template-columns:85px 45px 30px 1fr; gap:6px; align-items:center; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:6px 10px; margin-top:12px; margin-bottom:6px; border-left:4px solid #94a3b8; width:100%; box-sizing:border-box;">
-      <b style="font-size:11px; text-align:left; color:#cbd5e1;">Przed przerwą</b>
-      <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:100%; padding:4px 6px; border:1px solid rgba(255,255,255,0.15); border-radius:4px; background:rgba(0,0,0,0.3); color:#f8fafc; text-align:center; font-family:${technoFont}; font-weight:900; outline:none; font-size:12px; box-sizing:border-box;">
-      <div style="font-size:10px; color:#94a3b8; font-weight:900; text-align:left;"></div>
-      <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:999px; overflow:hidden; width:100%;">
-        <div style="height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#94a3b8; border-radius:999px; transition:width 0.4s ease;"></div>
+    rows += `<div style="display:grid; grid-template-columns:85px 45px 35px 1fr; gap:6px; align-items:center; background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:4px 8px; margin-top:8px; margin-bottom:4px; border-left:4px solid #8d9096; width:100%; box-sizing:border-box;">
+      <span style="font-size:11px; color:#555;">Przed przerwą</span>
+      <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:100%; padding:2px 4px; border:1px solid #8d9096; border-radius:3px; background:#fff; color:#0f1111; text-align:center; font-family:${nativeFont}; outline:none; font-size:12px; box-sizing:border-box;">
+      <div style="font-size:11px; color:#555; text-align:left;"></div>
+      <div style="height:6px; background:#e3e8ee; border-radius:3px; overflow:hidden; width:100%;">
+        <div style="height:100%; width:${Math.min(100, Math.round((beforeBreak / max) * 100))}%; background:#8d9096; border-radius:3px; transition:width 0.4s ease;"></div>
       </div>
     </div>`;
     panel.querySelector('#hours').innerHTML = rows; bindCountInputs();
@@ -323,9 +326,11 @@
     
     let isBreak = isBreakActive();
     panel.querySelector('#lt').textContent = isBreak ? 'TRWA PRZERWA...' : lastTrigger;
-    panel.querySelector('#lt').style.color = isBreak ? '#fbbf24' : '#cbd5e1';
+    panel.querySelector('#lt').style.color = isBreak ? '#e77600' : '#0f1111';
     
     panel.querySelector('#off').textContent = fmt(offRemain);
+    panel.querySelector('#off').style.color = offRemain < 60000 ? '#c40000' : '#007600';
+    
     panel.querySelector('#pb').textContent = problemTotal; panel.querySelector('#left').textContent = Math.max(0, shiftTarget() - total);
     
     updateHeader();
@@ -398,8 +403,18 @@
   
   window.addEventListener('beforeunload', () => saveState(true)); box.onclick = toggleUI;
 
-  panel.querySelector('#settingsBtn').onclick = () => showSettings(true); panel.querySelector('#backBtn').onclick = () => showSettings(false);
-  panel.querySelector('#ignoreNLP').checked = ignoreNLP; panel.querySelector('#ratePercent').checked = showRatePercent; panel.querySelector('#leftMode').checked = showLeftInsteadTotal; panel.querySelector('#autoColor').checked = autoStatusColor;
+  panel.querySelector('#settingsBtn').onmouseover = (e) => e.target.style.background = '#e7e7e7';
+  panel.querySelector('#settingsBtn').onmouseout = (e) => e.target.style.background = 'transparent';
+  panel.querySelector('#settingsBtn').onclick = () => showSettings(true); 
+  
+  panel.querySelector('#backBtn').onmouseover = (e) => e.target.style.background = '#e7e7e7';
+  panel.querySelector('#backBtn').onmouseout = (e) => e.target.style.background = '#f3f4f6';
+  panel.querySelector('#backBtn').onclick = () => showSettings(false);
+  
+  panel.querySelector('#ignoreNLP').checked = ignoreNLP; 
+  panel.querySelector('#ratePercent').checked = showRatePercent; 
+  panel.querySelector('#leftMode').checked = showLeftInsteadTotal; 
+  panel.querySelector('#autoColor').checked = autoStatusColor;
   panel.querySelector('#autoLpnToggle').checked = autoLpnEnabled;
   
   panel.querySelector('#breakSel').onchange = (e) => { selectedBreak = parseInt(e.target.value) || 0; saveState(true); updateHeader(); render(); };
@@ -409,10 +424,14 @@
   panel.querySelector('#leftMode').onchange = (e) => { showLeftInsteadTotal = e.target.checked; saveState(true); applyMini(); };
   panel.querySelector('#autoColor').onchange = (e) => { autoStatusColor = e.target.checked; saveState(true); applyMini(); };
   panel.querySelector('#autoLpnToggle').onchange = (e) => { autoLpnEnabled = e.target.checked; saveState(true); };
+  
+  panel.querySelector('#resetOff').onmouseover = (e) => e.target.style.background = '#d5d9d9';
+  panel.querySelector('#resetOff').onmouseout = (e) => e.target.style.background = '#e7e7e7';
   panel.querySelector('#resetOff').onclick = () => { offRemain = 30 * 60 * 1000; lastActivityTime = Date.now(); offLastTick = Date.now(); saveState(true); render(); };
+  
   panel.querySelector('#c').oninput = (e) => { manualColor = e.target.value; saveState(true); applyMini(); };
   panel.querySelector('#s').oninput = (e) => { miniSize = parseInt(e.target.value) || 12; box.style.fontSize = miniSize + 'px'; saveState(true); };
-  panel.querySelector('#o').oninput = (e) => { miniOpacity = parseInt(e.target.value) || 0; box.style.opacity = miniOpacity / 100; box.style.backdropFilter = `blur(${miniOpacity > 0 ? 8 : 0}px)`; saveState(true); };
+  panel.querySelector('#o').oninput = (e) => { miniOpacity = parseInt(e.target.value) || 0; box.style.opacity = miniOpacity / 100; saveState(true); };
   panel.querySelector('#target').oninput = (e) => { targetPerHour = parseInt(e.target.value) || 28; saveState(true); render(); };
   
   window.addEventListener('storage', (e) => {
