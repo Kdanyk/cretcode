@@ -12,6 +12,11 @@
   const hours = night ? nightHours : dayHours;
   const shiftName = night ? 'night' : 'day';
 
+  let autoLpnEnabled = true;
+  let cooldownUntil = 0;
+  const TARGET_TEXTS = ['перепризначте lpn', 'przypisz ponownie lpn'];
+  const IGNORED_PREFIXES = new Set(['t', '1', '0', '2']);
+
   let total = 0, problemTotal = 0, seen = '', start = Date.now(), lastTrigger = '-';
   let targetPerHour = 28, beforeBreak = 0, open = true, grace = 4 * 60 * 1000, selectedBreak = 1;
   let offRemain = 30 * 60 * 1000, lastActivityTime = Date.now(), offLastTick = Date.now();
@@ -35,6 +40,7 @@
       showLeftInsteadTotal = !!s.showLeftInsteadTotal;
       autoStatusColor = !!s.autoStatusColor;
       ignoreNLP = !!s.ignoreNLP;
+      autoLpnEnabled = s.autoLpnEnabled !== undefined ? !!s.autoLpnEnabled : true;
       manualColor = s.manualColor || '#808080';
       miniPos = s.miniPos || 'tl';
       miniOpacity = Math.min(100, Math.max(0, s.miniOpacity !== undefined ? parseInt(s.miniOpacity) : 100));
@@ -52,7 +58,7 @@
     const now = Date.now();
     if (!force && now - lastSave < 1500) return;
     lastSave = now;
-    try { localStorage.setItem(saveKey, JSON.stringify({ shift: shiftName, savedAt: now, start, problemTotal, beforeBreak, targetPerHour, selectedBreak, offRemain, showRatePercent, showLeftInsteadTotal, autoStatusColor, ignoreNLP, manualColor, miniOpacity, miniSize, miniPos, hourCounts, problemCounts, lastTrigger })); } catch (_) {}
+    try { localStorage.setItem(saveKey, JSON.stringify({ shift: shiftName, savedAt: now, start, problemTotal, beforeBreak, targetPerHour, selectedBreak, offRemain, showRatePercent, showLeftInsteadTotal, autoStatusColor, ignoreNLP, autoLpnEnabled, manualColor, miniOpacity, miniSize, miniPos, hourCounts, problemCounts, lastTrigger })); } catch (_) {}
   }
 
   loadState(); initCounts();
@@ -174,7 +180,8 @@
       <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Ignoruj NLP <input id="ignoreNLP" type="checkbox" style="width:18px; height:18px; accent-color:#ef4444; margin:0; cursor:pointer;" ${ignoreNLP ? 'checked' : ''}></label>
       <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Tempo % / h <input id="ratePercent" type="checkbox" style="width:18px; height:18px; accent-color:#3b82f6; margin:0; cursor:pointer;" ${showRatePercent ? 'checked' : ''}></label>
       <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Pozostało zamiast sumy <input id="leftMode" type="checkbox" style="width:18px; height:18px; accent-color:#3b82f6; margin:0; cursor:pointer;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Auto-kolor tempa <input id="autoColor" type="checkbox" style="width:18px; height:18px; accent-color:#3b82f6; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Auto-kolor tempa <input id="autoColor" type="checkbox" style="width:18px; height:18px; accent-color:#3b82f6; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:900; text-transform:uppercase; color:#1e293b; cursor:pointer;">Auto-Przypisz LPN <input id="autoLpnToggle" type="checkbox" style="width:18px; height:18px; accent-color:#10b981; margin:0; cursor:pointer;" ${autoLpnEnabled ? 'checked' : ''}></label>
     </div>
     <div style="background:#ffffff; border:1px solid rgba(0,0,0,0.06); border-radius:10px; padding:12px; margin-bottom:16px; width:100%; box-sizing:border-box;">
       <div style="font-size:10px; font-weight:900; text-transform:uppercase; margin-bottom:8px; color:#64748b;">Podgląd mini widgetu</div>
@@ -347,20 +354,58 @@
     }
     seen = txt;
   }
+
+  function findLpnButton() {
+    const selector = 'button, a, div[role="button"]';
+    return Array.from(document.querySelectorAll(selector)).find(el => {
+      if (el.disabled || el.offsetParent === null || !el.textContent) return false;
+      const text = el.textContent.toLowerCase().replace(/\s+/g, ' ');
+      return TARGET_TEXTS.some(target => text.includes(target));
+    });
+  }
+
+  function checkInputAndTrigger() {
+    if (!autoLpnEnabled) return;
+    const now = Date.now();
+    if (now < cooldownUntil) return;
+    const btn = findLpnButton();
+    if (!btn) {
+      cooldownUntil = now + 1500;
+      return;
+    }
+    const inputSelector = 'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([disabled])';
+    const inputs = document.querySelectorAll(inputSelector);
+    for (const input of inputs) {
+      if (input.offsetParent === null) continue;
+      const cleanValue = input.value.replace(/[^\x20-\x7E]/g, '').trim().toLowerCase();
+      if (!cleanValue) continue;
+      cooldownUntil = now + 15000;
+      if (!IGNORED_PREFIXES.has(cleanValue.charAt(0))) {
+        btn.click();
+      }
+      break;
+    }
+  }
   
   function toggleUI() { open = !open; panel.style.transform = open ? 'translateX(0)' : 'translateX(370px)'; panel.style.opacity = open ? '1' : '0'; panel.style.pointerEvents = open ? 'auto' : 'none'; }
   function showSettings(v) { panel.querySelector('#mainView').style.display = v ? 'none' : 'block'; panel.querySelector('#settingsView').style.display = v ? 'block' : 'none'; applyMini(); }
 
-  setInterval(scan, 1000); setInterval(render, 1000); window.addEventListener('beforeunload', () => saveState(true)); box.onclick = toggleUI;
+  setInterval(scan, 1000); 
+  setInterval(render, 1000); 
+  setInterval(checkInputAndTrigger, 80);
+  
+  window.addEventListener('beforeunload', () => saveState(true)); box.onclick = toggleUI;
 
   panel.querySelector('#settingsBtn').onclick = () => showSettings(true); panel.querySelector('#backBtn').onclick = () => showSettings(false);
   panel.querySelector('#ignoreNLP').checked = ignoreNLP; panel.querySelector('#ratePercent').checked = showRatePercent; panel.querySelector('#leftMode').checked = showLeftInsteadTotal; panel.querySelector('#autoColor').checked = autoStatusColor;
+  panel.querySelector('#autoLpnToggle').checked = autoLpnEnabled;
   panel.querySelector('#breakSel').onchange = (e) => { selectedBreak = parseInt(e.target.value) || 0; saveState(true); updateHeader(); render(); };
   panel.querySelector('#pos').onchange = (e) => { miniPos = e.target.value; applyMiniPos(); saveState(true); };
   panel.querySelector('#ignoreNLP').onchange = (e) => { ignoreNLP = e.target.checked; saveState(true); };
   panel.querySelector('#ratePercent').onchange = (e) => { showRatePercent = e.target.checked; saveState(true); applyMini(); };
   panel.querySelector('#leftMode').onchange = (e) => { showLeftInsteadTotal = e.target.checked; saveState(true); applyMini(); };
   panel.querySelector('#autoColor').onchange = (e) => { autoStatusColor = e.target.checked; saveState(true); applyMini(); };
+  panel.querySelector('#autoLpnToggle').onchange = (e) => { autoLpnEnabled = e.target.checked; saveState(true); };
   panel.querySelector('#resetOff').onclick = () => { offRemain = 30 * 60 * 1000; lastActivityTime = Date.now(); offLastTick = Date.now(); saveState(true); render(); };
   panel.querySelector('#c').oninput = (e) => { manualColor = e.target.value; saveState(true); applyMini(); };
   panel.querySelector('#s').oninput = (e) => { miniSize = parseInt(e.target.value) || 12; box.style.fontSize = miniSize + 'px'; saveState(true); };
