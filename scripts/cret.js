@@ -50,7 +50,7 @@
         hourCounts[h] = Math.max(0, parseInt(s.hourCounts && s.hourCounts[h]) || 0);
         problemCounts[h] = Math.max(0, parseInt(s.problemCounts && s.problemCounts[h]) || 0);
       });
-      lastTrigger = s.lastTrigger || 'PRZYWRÓCONO';
+      lastTrigger = s.lastTrigger || 'ВІДНОВЛЕНО';
     } catch (_) { initCounts(); }
   }
 
@@ -101,7 +101,7 @@
 
   const box = document.createElement('div');
   box.setAttribute('data-reit-counter', 'mini');
-  box.style = 'position:fixed;background:#ffffff;color:' + manualColor + ';padding:4px 8px;font-size:' + miniSize + 'px;font-family:' + nativeFont + ';z-index:999999;border-radius:4px;border:1px solid #d5d9d9;box-shadow:0 2px 5px rgba(0,0,0,0.1);opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:bold;letter-spacing:0;';
+  box.style = 'position:fixed;background:transparent;color:' + manualColor + ';padding:4px 8px;font-size:' + miniSize + 'px;font-family:' + nativeFont + ';z-index:999999;border-radius:4px;border:none;box-shadow:none;opacity:' + (miniOpacity / 100) + ';cursor:pointer;user-select:none;font-weight:bold;letter-spacing:0;';
 
   function applyMiniPos() {
     box.style.top = 'auto'; box.style.bottom = 'auto'; box.style.left = 'auto'; box.style.right = 'auto';
@@ -119,12 +119,12 @@
   panel.innerHTML = `
   <div id="mainView" style="width:100%; box-sizing:border-box;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #e7e7e7; padding-bottom:8px;">
-      <div id="mainTitle" style="font-size:16px; font-weight:bold; color:#0f1111;">C-RET Dashboard</div>
-      <button id="settingsBtn" title="Ustawienia" style="width:28px; height:28px; border:1px solid transparent; border-radius:4px; background:transparent; color:#555; font-size:14px; cursor:pointer; transition:background 0.2s;">⚙️</button>
+      <div id="mainTitle" style="font-size:16px; font-weight:bold; color:#0f1111;">C-RET Панель</div>
+      <button id="settingsBtn" title="Налаштування" style="width:28px; height:28px; border:1px solid transparent; border-radius:4px; background:transparent; color:#555; font-size:14px; cursor:pointer; transition:background 0.2s;">⚙️</button>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; width:100%; box-sizing:border-box;">
       <div style="background:#f3f3f3; border:1px solid #e7e7e7; border-radius:4px; padding:8px;">
-        <div style="font-size:11px; color:#555; margin-bottom:2px;">Ostatni trigger</div>
+        <div style="font-size:11px; color:#555; margin-bottom:2px;">Останній тригер</div>
         <div id="lt" style="font-size:12px; font-weight:bold; color:#0f1111; word-break:break-all; line-height:1.2;">-</div>
       </div>
       <div style="background:#f3f3f3; border:1px solid #e7e7e7; border-radius:4px; padding:8px;">
@@ -134,61 +134,61 @@
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; width:100%; box-sizing:border-box;">
       <div style="background:#fff4f4; border:1px solid #d00000; color:#c40000; padding:10px 8px; border-radius:4px; text-align:center;">
-        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Problem</div>
+        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Проблема</div>
         <div id="pb" style="font-size:20px; font-weight:bold;">0</div>
       </div>
       <div style="background:#f0f8fa; border:1px solid #007185; color:#007185; padding:10px 8px; border-radius:4px; text-align:center;">
-        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Pozostało</div>
+        <div style="font-size:11px; font-weight:bold; margin-bottom:2px;">Залишилось</div>
         <div id="left" style="font-size:20px; font-weight:bold;">0</div>
       </div>
     </div>
-    <div style="font-size:13px; font-weight:bold; margin-bottom:6px; color:#0f1111;">Godziny pracy</div>
+    <div style="font-size:13px; font-weight:bold; margin-bottom:6px; color:#0f1111;">Робочі години</div>
     <div id="hours" style="width:100%; box-sizing:border-box;"></div>
   </div>
   <div id="settingsView" style="display:none; width:100%; box-sizing:border-box;">
     <div style="display:flex; align-items:center; margin-bottom:12px; border-bottom:1px solid #e7e7e7; padding-bottom:8px;">
-      <button id="backBtn" title="Powrót" style="width:28px; height:28px; border:1px solid #d5d9d9; border-radius:4px; background:#f3f4f6; color:#0f1111; font-size:16px; cursor:pointer; margin-right:8px; display:flex; align-items:center; justify-content:center;">‹</button>
-      <div style="font-size:16px; font-weight:bold; color:#0f1111;">Ustawienia</div>
+      <button id="backBtn" title="Назад" style="width:28px; height:28px; border:1px solid #d5d9d9; border-radius:4px; background:#f3f4f6; color:#0f1111; font-size:16px; cursor:pointer; margin-right:8px; display:flex; align-items:center; justify-content:center;">‹</button>
+      <div style="font-size:16px; font-weight:bold; color:#0f1111;">Налаштування</div>
     </div>
     <div style="background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:10px; width:100%; box-sizing:border-box;">
       <div style="display:grid; grid-template-columns:105px 1fr; gap:8px; align-items:center; font-size:12px; font-weight:normal; color:#0f1111; width:100%; box-sizing:border-box;">
-        <label>Wyklucz Przerwę</label>
+        <label>Виключити перерву</label>
         <select id="breakSel" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; margin:0; outline:none;">
-          <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>Brak</option>
-          <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>Przerwa 1 (11:20/23:20)</option>
-          <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>Przerwa 2 (11:50/23:50)</option>
-          <option value="3" ${selectedBreak === 3 ? 'selected' : ''}>Przerwa 3 (12:20/00:20)</option>
-          <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>Przerwa 4 (12:50/00:50)</option>
+          <option value="0" ${selectedBreak === 0 ? 'selected' : ''}>Немає</option>
+          <option value="1" ${selectedBreak === 1 ? 'selected' : ''}>Перерва 1 (11:20/23:20)</option>
+          <option value="2" ${selectedBreak === 2 ? 'selected' : ''}>Перерва 2 (11:50/23:50)</option>
+          <option value="3" ${selectedBreak === 3 ? 'selected' : ''}>Перерва 3 (12:20/00:20)</option>
+          <option value="4" ${selectedBreak === 4 ? 'selected' : ''}>Перерва 4 (12:50/00:50)</option>
         </select>
-        <label>Pozycja mini</label>
+        <label>Позиція міні</label>
         <select id="pos" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; margin:0; outline:none;">
-          <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>Dół - Lewo</option>
-          <option value="br" ${miniPos === 'br' ? 'selected' : ''}>Dół - Prawo</option>
-          <option value="tl" ${miniPos === 'tl' ? 'selected' : ''}>Góra - Lewo</option>
-          <option value="tr" ${miniPos === 'tr' ? 'selected' : ''}>Góra - Prawo</option>
+          <option value="bl" ${miniPos === 'bl' ? 'selected' : ''}>Вниз - Ліворуч</option>
+          <option value="br" ${miniPos === 'br' ? 'selected' : ''}>Вниз - Праворуч</option>
+          <option value="tl" ${miniPos === 'tl' ? 'selected' : ''}>Вгору - Ліворуч</option>
+          <option value="tr" ${miniPos === 'tr' ? 'selected' : ''}>Вгору - Праворуч</option>
         </select>
-        <label>Kolor mini</label>
+        <label>Колір міні</label>
         <input type="color" id="c" value="${manualColor}" style="width:100%; height:26px; border:1px solid #8d9096; border-radius:3px; cursor:pointer; background:#fff; padding:0; box-sizing:border-box; margin:0;">
-        <label>Rozmiar mini</label>
+        <label>Розмір міні</label>
         <input type="range" id="s" min="10" max="45" value="${miniSize}" style="width:100%; accent-color:#007185; box-sizing:border-box; margin:0;">
-        <label>Widoczność</label>
+        <label>Видимість</label>
         <input type="range" id="o" min="0" max="100" value="${miniOpacity}" style="width:100%; accent-color:#007185; box-sizing:border-box; margin:0;">
-        <label>Reit/h cel</label>
+        <label>Ціль Reit/h</label>
         <input type="text" inputmode="numeric" id="target" value="${targetPerHour}" style="width:100%; padding:4px 8px; border-radius:3px; border:1px solid #8d9096; background:#fff; color:#0f1111; font-family:${nativeFont}; box-sizing:border-box; outline:none; margin:0;">
       </div>
     </div>
     <div style="background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:10px; width:100%; box-sizing:border-box;">
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Ignoruj NLP <input id="ignoreNLP" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${ignoreNLP ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Tempo % / h <input id="ratePercent" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showRatePercent ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Pozostało zamiast sumy <input id="leftMode" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Auto-kolor tempa <input id="autoColor" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
-      <label style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#0f1111; cursor:pointer; font-weight:bold;">Auto-Przypisz LPN <input id="autoLpnToggle" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoLpnEnabled ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Ігнорувати NLP <input id="ignoreNLP" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${ignoreNLP ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Темп %/h <input id="ratePercent" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showRatePercent ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Залишилось замість суми <input id="leftMode" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${showLeftInsteadTotal ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:#0f1111; cursor:pointer;">Автоколір темпу <input id="autoColor" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoStatusColor ? 'checked' : ''}></label>
+      <label style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#0f1111; cursor:pointer; font-weight:bold;">Автопризначення LPN <input id="autoLpnToggle" type="checkbox" style="width:16px; height:16px; accent-color:#007185; margin:0; cursor:pointer;" ${autoLpnEnabled ? 'checked' : ''}></label>
     </div>
     <div style="background:#fff; border:1px solid #e7e7e7; border-radius:4px; padding:10px; margin-bottom:12px; width:100%; box-sizing:border-box;">
-      <div style="font-size:11px; color:#555; margin-bottom:4px;">Podgląd mini widgetu</div>
+      <div style="font-size:11px; color:#555; margin-bottom:4px;">Попередній перегляд міні</div>
       <div id="miniPreview" style="font-size:14px; font-weight:bold; background:#fff; border:1px solid #d5d9d9; border-radius:4px; padding:6px; text-align:center; color:#0f1111; width:100%; box-sizing:border-box;">0 | 0.00/h</div>
     </div>
-    <button id="resetOff" style="width:100%; padding:8px; border:none; border-radius:4px; background:#e7e7e7; color:#0f1111; font-family:${nativeFont}; font-size:13px; font-weight:bold; cursor:pointer; border:1px solid #d5d9d9; box-sizing:border-box; margin-bottom:8px;">Zresetuj Off Task</button>
+    <button id="resetOff" style="width:100%; padding:8px; border:none; border-radius:4px; background:#e7e7e7; color:#0f1111; font-family:${nativeFont}; font-size:13px; font-weight:bold; cursor:pointer; border:1px solid #d5d9d9; box-sizing:border-box; margin-bottom:8px;">Скинути Off Task</button>
   </div>`;
 
   document.body.appendChild(panel);
@@ -234,7 +234,7 @@
   
   function updateHeader() {
     const hdr = panel.querySelector('#mainTitle');
-    if (hdr) hdr.innerHTML = 'C-RET Dashboard' + (selectedBreak > 0 ? ' <span style="font-size:11px; color:#555; font-weight:normal; margin-left:6px;">(Przerwa: ' + selectedBreak + ')</span>' : '');
+    if (hdr) hdr.innerHTML = 'C-RET Панель' + (selectedBreak > 0 ? ' <span style="font-size:11px; color:#555; font-weight:normal; margin-left:6px;">(Перерва: ' + selectedBreak + ')</span>' : '');
   }
 
   function applyMini() {
@@ -246,7 +246,7 @@
     n = parseInt(n) || 0; if (n <= 0) return; 
     loadState();
     const slot = getSlot(); hourCounts[slot] += n; 
-    recalcTotal(); lastTrigger = 'RĘCZNIE +' + n + ' ' + timeNow(); 
+    recalcTotal(); lastTrigger = 'ВРУЧНУ +' + n + ' ' + timeNow(); 
     markActivity(); saveState(true); render(); 
   }
   function removePack() { 
@@ -254,7 +254,7 @@
     const slot = getSlot(); 
     if (hourlyTotal() > 0) { 
         hourCounts[slot] = Math.max(0, hourCounts[slot] - 1); 
-        recalcTotal(); lastTrigger = 'RĘCZNIE -1 ' + timeNow(); 
+        recalcTotal(); lastTrigger = 'ВРУЧНУ -1 ' + timeNow(); 
         saveState(true); render(); 
     } 
   }
@@ -262,7 +262,7 @@
     n = parseInt(n) || 0; if (n <= 0) return; 
     loadState();
     problemTotal += n; problemCounts[getSlot()] += n; 
-    lastTrigger = 'PROBLEM ' + timeNow(); markActivity(); saveState(true); render(); 
+    lastTrigger = 'ПРОБЛЕМА ' + timeNow(); markActivity(); saveState(true); render(); 
   }
   
   function bindCountInputs() {
@@ -272,7 +272,7 @@
           let newVal = Math.max(0, parseInt(e.target.value) || 0);
           loadState();
           hourCounts[e.target.getAttribute('data-h')] = newVal;
-          lastTrigger = 'RĘCZNIE ' + timeNow(); saveState(true); renderHours(true); render(); 
+          lastTrigger = 'ВРУЧНУ ' + timeNow(); saveState(true); renderHours(true); render(); 
       };
     });
     const bb = panel.querySelector('#beforeBreak');
@@ -282,7 +282,7 @@
           let newVal = Math.max(0, parseInt(e.target.value) || 0);
           loadState();
           beforeBreak = newVal;
-          lastTrigger = 'RĘCZNIE ' + timeNow(); saveState(true); renderHours(true); render(); 
+          lastTrigger = 'ВРУЧНУ ' + timeNow(); saveState(true); renderHours(true); render(); 
       };
     }
   }
@@ -308,7 +308,7 @@
     }).join('');
     const bbBars = Math.min(100, Math.round((beforeBreak / max) * 100));
     rows += `<div style="display:grid; grid-template-columns:85px 45px 35px 1fr; gap:6px; align-items:center; background:#f9f9f9; border:1px solid #e7e7e7; border-radius:4px; padding:4px 8px; margin-top:8px; margin-bottom:4px; border-left:4px solid #8d9096; width:100%; box-sizing:border-box;">
-      <span style="font-size:11px; color:#555;">Przed przerwą</span>
+      <span style="font-size:11px; color:#555;">До перерви</span>
       <input id="beforeBreak" type="text" inputmode="numeric" value="${beforeBreak}" style="width:100%; padding:2px 4px; border:1px solid #8d9096; border-radius:3px; background:#fff; color:#0f1111; text-align:center; font-family:${nativeFont}; outline:none; font-size:12px; box-sizing:border-box;">
       <div style="font-size:11px; color:#555; text-align:left;"></div>
       <div style="height:6px; background:#e3e8ee; border-radius:3px; overflow:hidden; width:100%;">
@@ -324,7 +324,7 @@
     offLastTick = now;
     
     let isBreak = isBreakActive();
-    panel.querySelector('#lt').textContent = isBreak ? 'TRWA PRZERWA...' : lastTrigger;
+    panel.querySelector('#lt').textContent = isBreak ? 'ТРИВАЄ ПЕРЕРВА...' : lastTrigger;
     panel.querySelector('#lt').style.color = isBreak ? '#e77600' : '#0f1111';
     
     panel.querySelector('#off').textContent = fmt(offRemain);
@@ -341,17 +341,17 @@
     
     if (!ignoreNLP && nlpm > nlpp) { 
         skipNextPack = true; 
-        lastTrigger = 'NLP: POMIŃ NASTĘPNĄ ' + timeNow(); 
+        lastTrigger = 'NLP: ПРОПУСТИТИ НАСТУПНУ ' + timeNow(); 
         markActivity(); saveState(true); render(); 
     }
     
     if (pm > pp) addProblem(pm - pp);
     else if (m > p) { 
       let diff = m - p; 
-      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'POMINIĘTO PO NLP ' + timeNow(); } 
+      if (skipNextPack) { diff--; skipNextPack = false; lastTrigger = 'ПРОПУЩЕНО ПІСЛЯ NLP ' + timeNow(); } 
       if (diff > 0) { 
         if (isBreakActive()) {
-          lastTrigger = 'PRZERWA - IGNORUJĘ ' + diff;
+          lastTrigger = 'ПЕРЕРВА - ІГНОРУЮ ' + diff;
           markActivity(); saveState(true); render();
         } else {
           addPacks(diff); 
